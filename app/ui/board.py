@@ -1,4 +1,3 @@
-
 class Colors:
   RESET = '\033[49;0m'
   DARK  = '\033[38;5;232;1m'
