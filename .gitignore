@@ -6,6 +6,7 @@ htmlcov
 *.egg-info
 *.coverage
 __pycache__
+.DS_Store
 
 # Project-specific ignores
 flasher_config.ini
