@@ -9,7 +9,7 @@ class Engine(object):
     self.engine = chess.engine.SimpleEngine.popen_uci(os.path.join(file_path, engine_path))
 
   def play(self, board):
-    return self.engine.play(board, chess.engine.Limit(time=1.000))
+    return self.engine.play(board, chess.engine.Limit(time=1.500))
 
   def done(self):
     return self.engine.quit()

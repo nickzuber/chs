@@ -23,18 +23,17 @@ class Client(object):
           self.computer_turn()
     except KeyboardInterrupt:
       self.clear()
-      print(self.ui_board.get_board_from_fen(self.fen()))
+      print(self.ui_board.get_board_from_fen(self.fen(), self.board.is_check()))
       print('\nWhite resigns 0-1')
     self.engine.done()
 
   def make_turn(self, failed=False):
     self.clear()
-    fen = self.fen()
-    print(self.ui_board.get_board_from_fen(fen))
+    print(self.ui_board.get_board_from_fen(self.fen(), self.board.is_check()))
     if failed:
-      print('\nIllegal move, try again')
+      print('Illegal move, try again')
     else:
-      print('\n')
+      print('')
     move = input('Your move: ')
     try:
       self.board.push_san(move)
@@ -43,8 +42,7 @@ class Client(object):
 
   def computer_turn(self):
     self.clear()
-    fen = self.fen()
-    print(self.ui_board.get_board_from_fen(fen))
+    print(self.ui_board.get_board_from_fen(self.fen(), self.board.is_check()))
     print('\nWaiting for Stockfish...')
     result = self.engine.play(self.board)
     self.board.push(result.move)

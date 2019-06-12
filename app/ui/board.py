@@ -2,6 +2,7 @@ class Colors:
   RESET = '\033[49;0m'
   DARK  = '\033[38;5;232;1m'
   LIGHT  = '\033[38;5;231;1m'
+  RED  = '\033[38;5;1;124m'
   class Backgrounds:
     DARK = '\033[48;5;172;1m'
     LIGHT = '\033[48;5;215;1m'
@@ -16,18 +17,25 @@ def flatten(l):
 class Board(object):
   FILES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 
-  def get_board_from_fen(self, fen):
+  def get_board_from_fen(self, fen, is_check=False):
     # Label who's turn it is to move
-    to_move = fen.split(' ')[1]
-    board = self.get_title_from_move(to_move)
+    turn = fen.split(' ')[1]
+    board = self.get_title_from_move(turn)
 
     # Draw the board and pieces
     positions = fen.split(' ')[0]
     ranks = positions.split('/')
     rank_i = 8
+
+    def get_piece_composed(piece):
+      if turn == 'b':
+        return self.get_piece(piece, is_check, False)
+      else:
+        return self.get_piece(piece, False, is_check)
+
     for rank in ranks:
       file_i = 1
-      pieces = flatten(map(self.get_piece, list(rank)))
+      pieces = flatten(map(get_piece_composed, list(rank)))
       board += '{}{} '.format(PADDING, str(rank_i))
       # Add each piece + tile
       for piece in pieces:
@@ -38,7 +46,7 @@ class Board(object):
       board = '{}{}\n'.format(board, Colors.RESET)
       rank_i = rank_i - 1
     # Add files label
-    board += '  {}'.format(PADDING)
+    board += ' {}'.format(PADDING)
     for f in self.FILES:
       board += ' {}'.format(f)
     return board
@@ -61,21 +69,23 @@ class Board(object):
       return Colors.Backgrounds.LIGHT
     return Colors.Backgrounds.DARK
 
-  def get_piece(self, letter):
+  def get_piece(self, letter, is_black_check, is_white_check):
+    black_king_color = Colors.RED if is_black_check else Colors.DARK
+    white_king_color = Colors.RED if is_white_check else Colors.LIGHT
     pieces = {
       # White
       'R': [Colors.LIGHT + '♜ ' + Colors.RESET],
       'N': [Colors.LIGHT + '♞ ' + Colors.RESET],
       'B': [Colors.LIGHT + '♗ ' + Colors.RESET],
       'Q': [Colors.LIGHT + '♕ ' + Colors.RESET],
-      'K': [Colors.LIGHT + '♔ ' + Colors.RESET],
+      'K': [white_king_color + '♔ ' + Colors.RESET],
       'P': [Colors.LIGHT + '♙ ' + Colors.RESET],
       # Black
       'r': [Colors.DARK + '♜ ' + Colors.RESET],
       'n': [Colors.DARK + '♞ ' + Colors.RESET],
       'b': [Colors.DARK + '♝ ' + Colors.RESET],
       'q': [Colors.DARK + '♛ ' + Colors.RESET],
-      'k': [Colors.DARK + '♚ ' + Colors.RESET],
+      'k': [black_king_color + '♚ ' + Colors.RESET],
       'p': [Colors.DARK + '♙ ' + Colors.RESET],
       '1': ['  '],
       '2': ['  ', '  '],
