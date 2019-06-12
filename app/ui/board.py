@@ -5,7 +5,10 @@ class Colors:
   class Backgrounds:
     DARK = '\033[48;5;172;1m'
     LIGHT = '\033[48;5;215;1m'
-    LIGHTBLUE = '\033[104m'
+    BLACK = '\033[48;5;232;1m'
+    WHITE = '\033[48;5;15;1m'
+
+PADDING = '    '
 
 def flatten(l):
   return [item for sublist in l for item in sublist]
@@ -14,28 +17,40 @@ class Board(object):
   FILES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 
   def get_board_from_fen(self, fen):
-    board = ''
+    # Label who's turn it is to move
+    to_move = fen.split(' ')[1]
+    board = self.get_title_from_move(to_move)
+
+    # Draw the board and pieces
     positions = fen.split(' ')[0]
     ranks = positions.split('/')
     rank_i = 8
     for rank in ranks:
       file_i = 1
       pieces = flatten(map(self.get_piece, list(rank)))
-      # Add rank label
-      board += str(rank_i) + ' '
+      board += '{}{} '.format(PADDING, str(rank_i))
       # Add each piece + tile
       for piece in pieces:
         color = self.get_tile_color_from_position(rank_i, file_i)
-        board = board + color + piece
+        board = '{}{}{}'.format(board, color, piece)
         file_i = file_i + 1
       # Finish the rank
-      board = board + Colors.RESET + '\n'
+      board = '{}{}\n'.format(board, Colors.RESET)
       rank_i = rank_i - 1
     # Add files label
-    board += '  '
+    board += '  {}'.format(PADDING)
     for f in self.FILES:
-      board += f + ' '
+      board += ' {}'.format(f)
     return board
+
+  def get_title_from_move(self, turn):
+    player = '{} to move'.format('Black' if turn == 'b' else 'White')
+    colors = '{}'.format(\
+      Colors.Backgrounds.BLACK + Colors.LIGHT if turn == 'b' else\
+      Colors.Backgrounds.WHITE + Colors.DARK)
+    return '\n{}{}   {}   {}\n{}{}                   {}\n\n'\
+      .format(PADDING, colors, player, Colors.RESET,\
+              PADDING, colors, Colors.RESET)
 
   def get_tile_color_from_position(self, r, f):
     if r % 2 == 0:
@@ -72,7 +87,3 @@ class Board(object):
       '8': ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ']
     }
     return pieces.get(letter)
-
-fen = 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1'
-board = Board();
-print(board.get_board_from_fen(fen))

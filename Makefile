@@ -9,7 +9,7 @@ p_dot_red = @printf "\033[31m ∗\033[39m \033[89m%s\033[39m\n" "$(1)"
 
 run:
 	$(call pprintf,Running app)
-	python3 ./app
+	@python3 ./app
 
 test:
 	$(call pprintf,Running tests for project)
