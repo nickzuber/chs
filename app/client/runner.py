@@ -8,6 +8,26 @@ from engine.parser import FenParser
 from engine.stockfish import Engine
 from utils.core import Colors
 
+class GameOverException(Exception):
+  """
+  Raised when the game is over.
+  """
+
+class WhiteWinsException(GameOverException):
+  """
+  Raised when White wins.
+  """
+
+class BlackWinsException(GameOverException):
+  """
+  Raised when Black wins.
+  """
+
+class DrawException(GameOverException):
+  """
+  Raised when there is a draw.
+  """
+
 class Client(object):
   BACK = 'back'
 
@@ -20,16 +40,45 @@ class Client(object):
   def run(self):
     try:
       while True:
+        self.check_game_over()
         to_move = self.parser.get_to_move(self.fen())
         if to_move == 'w':
           self.make_turn()
         else:
           self.computer_turn()
     except KeyboardInterrupt:
+      self.white_resigns()
+    except BlackWinsException:
+      # TODO
       self.clear()
       print(self.ui_board.get_board_from_fen(self.fen(), self.board.is_check()))
-      print('\nWhite resigns 0-1')
+      print('Black wins')
+    except WhiteWinsException:
+      # TODO
+      self.clear()
+      print(self.ui_board.get_board_from_fen(self.fen(), self.board.is_check()))
+      print('White wins')
+    except DrawException:
+      # TODO
+      self.clear()
+      print(self.ui_board.get_board_from_fen(self.fen(), self.board.is_check()))
+      print('Draw')
     self.engine.done()
+
+  def white_resigns(self):
+    self.clear()
+    print(self.ui_board.get_board_from_fen(self.fen(), self.board.is_check()))
+    print('\nWhite resigns')
+
+  def check_game_over(self):
+    if self.board.is_game_over():
+      result = self.board.result()
+      if result == '1-0':
+        raise WhiteWinsException
+      if result == '0-1':
+        raise BlackWinsException
+      if result == '1/2-1/2':
+        raise DrawException
 
   def moves(self):
     return map(self.board.san, self.board.legal_moves)

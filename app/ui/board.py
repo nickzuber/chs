@@ -40,6 +40,7 @@ class Board(object):
     board += ' {}'.format(PADDING)
     for f in self.FILES:
       board += ' {}'.format(f)
+    board += '\n'
     return board
 
   def get_title_from_move(self, turn):
