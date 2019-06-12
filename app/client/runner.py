@@ -51,23 +51,23 @@ class Client(object):
     except BlackWinsException:
       # TODO
       self.clear()
-      print(self.ui_board.get_board_from_fen(self.fen(), self.board.is_check()))
+      print(self.ui_board.generate(self.fen(), self.board, self.engine))
       print('Black wins')
     except WhiteWinsException:
       # TODO
       self.clear()
-      print(self.ui_board.get_board_from_fen(self.fen(), self.board.is_check()))
+      print(self.ui_board.generate(self.fen(), self.board, self.engine))
       print('White wins')
     except DrawException:
       # TODO
       self.clear()
-      print(self.ui_board.get_board_from_fen(self.fen(), self.board.is_check()))
+      print(self.ui_board.generate(self.fen(), self.board, self.engine))
       print('Draw')
     self.engine.done()
 
   def white_resigns(self):
     self.clear()
-    print(self.ui_board.get_board_from_fen(self.fen(), self.board.is_check()))
+    print(self.ui_board.generate(self.fen(), self.board, self.engine))
     print('\nWhite resigns')
 
   def check_game_over(self):
@@ -93,7 +93,7 @@ class Client(object):
   def make_turn(self, meta=(False, None)):
     (failed, prev_move) = meta
     self.clear()
-    print(self.ui_board.get_board_from_fen(self.fen(), self.board.is_check()))
+    print(self.ui_board.generate(self.fen(), self.board, self.engine))
     if failed:
       if prev_move == self.BACK:
         print('You cannot go back, no moves were made')
@@ -119,7 +119,7 @@ class Client(object):
 
   def computer_turn(self):
     self.clear()
-    print(self.ui_board.get_board_from_fen(self.fen(), self.board.is_check()))
+    print(self.ui_board.generate(self.fen(), self.board, self.engine))
     print('\nWaiting for Stockfish...')
     result = self.engine.play(self.board)
     self.board.push(result.move)

@@ -8,7 +8,11 @@ def flatten(l):
 class Board(object):
   FILES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 
-  def get_board_from_fen(self, fen, is_check=False):
+  def generate(self, fen, board, engine):
+    is_check = board.is_check()
+
+    print(engine.score(board))
+
     # Label who's turn it is to move
     turn = fen.split(' ')[1]
     board = self.get_title_from_move(turn)

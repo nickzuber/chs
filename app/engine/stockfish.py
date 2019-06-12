@@ -11,5 +11,9 @@ class Engine(object):
   def play(self, board):
     return self.engine.play(board, chess.engine.Limit(time=1.500))
 
+  def score(self, board):
+    info = self.engine.analyse(board, chess.engine.Limit(time=0.100))
+    return chess.engine.PovScore(info['score'], chess.WHITE)
+
   def done(self):
     return self.engine.quit()
