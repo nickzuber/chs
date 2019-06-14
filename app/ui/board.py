@@ -32,7 +32,7 @@ class Board(object):
   def _generate(self, fen, board, loading=False):
     self.clear()
     is_check = board.is_check()
-    loading_text = 'loading...' if loading else ''
+    loading_text = '   {}↻{}\n'.format(Colors.GRAY, Colors.RESET) if loading else '\n'
 
     # Label who's turn it is to move
     turn = fen.split(' ')[1]
@@ -64,27 +64,35 @@ class Board(object):
       board = '{}{}  {}\n'.format(board, Colors.RESET, self.get_bar_section(rank_i))
       rank_i = rank_i - 1
     # Add files label
-    board += ' {}'.format(PADDING)
+    board += ' {}{}'.format(PADDING, Colors.GRAY)
     for f in self.FILES:
       board += ' {}'.format(f)
-    board += '\n'
+    board += '\n{}'.format(Colors.RESET)
     return board
 
   def get_bar_section(self, rank):
-    color = Colors.LIGHT
-    score = ''
-    if rank == 1:
-      score = '{}{}{}%'.format(Colors.RESET, Colors.GRAY, self._score)
-    return '{}█ {}{}'.format(color, score, Colors.RESET)
+    percentage = ''
+    tick = ' '
+    color = Colors.DULL_GRAY
+    normalized_score = self._score + 100
+    block_range = rank * 25
+    # Color the bar blocks
+    if normalized_score > block_range:
+      color = Colors.GREEN if self._score >= 0 else Colors.RED
+    # Current bar block is within the block's value range
+    if normalized_score - block_range < 25 and normalized_score > block_range:
+      percentage = '{}{}{}{}%'.format(Colors.RESET, Colors.BOLD, Colors.GRAY, self._score)
+    if block_range == 100:
+      tick = '{}-{}'.format(Colors.DULL_GRAY, color)
+    return '{}{}█ {}{}'.format(color, tick, percentage, Colors.RESET)
 
   def get_title_from_move(self, turn):
     player = '{} to move'.format('Black' if turn == 'b' else 'White')
     colors = '{}'.format(\
       Colors.Backgrounds.BLACK + Colors.LIGHT if turn == 'b' else\
       Colors.Backgrounds.WHITE + Colors.DARK)
-    return '\n {}{}  {}  {} \n{}\n'\
-      .format(PADDING, colors, player, Colors.RESET,\
-              PADDING, colors, Colors.RESET)
+    return '\n\n {}{}  {}  {}'\
+      .format(PADDING, colors, player, Colors.RESET)
 
   def get_tile_color_from_position(self, r, f):
     if r % 2 == 0:
