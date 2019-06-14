@@ -1,7 +1,6 @@
 
 import chess
 import editdistance
-from os import system, name
 
 from ui.board import Board
 from engine.parser import FenParser
@@ -9,24 +8,16 @@ from engine.stockfish import Engine
 from utils.core import Colors
 
 class GameOverException(Exception):
-  """
-  Raised when the game is over.
-  """
+  pass
 
 class WhiteWinsException(GameOverException):
-  """
-  Raised when White wins.
-  """
+  pass
 
 class BlackWinsException(GameOverException):
-  """
-  Raised when Black wins.
-  """
+  pass
 
 class DrawException(GameOverException):
-  """
-  Raised when there is a draw.
-  """
+  pass
 
 class Client(object):
   BACK = 'back'
@@ -50,24 +41,21 @@ class Client(object):
       self.white_resigns()
     except BlackWinsException:
       # TODO
-      self.clear()
-      print(self.ui_board.generate(self.fen(), self.board, self.engine))
+      self.ui_board.generate(self.fen(), self.board, self.engine)
       print('Black wins')
     except WhiteWinsException:
       # TODO
-      self.clear()
-      print(self.ui_board.generate(self.fen(), self.board, self.engine))
+      self.ui_board.generate(self.fen(), self.board, self.engine)
       print('White wins')
     except DrawException:
       # TODO
-      self.clear()
-      print(self.ui_board.generate(self.fen(), self.board, self.engine))
+      self.ui_board.generate(self.fen(), self.board, self.engine)
       print('Draw')
-    self.engine.done()
+    finally:
+      self.engine.done()
 
   def white_resigns(self):
-    self.clear()
-    print(self.ui_board.generate(self.fen(), self.board, self.engine))
+    self.ui_board.generate(self.fen(), self.board, self.engine)
     print('\nWhite resigns')
 
   def check_game_over(self):
@@ -92,15 +80,14 @@ class Client(object):
 
   def make_turn(self, meta=(False, None)):
     (failed, prev_move) = meta
-    self.clear()
-    print(self.ui_board.generate(self.fen(), self.board, self.engine))
+    self.ui_board.generate(self.fen(), self.board, self.engine)
     if failed:
       if prev_move == self.BACK:
         print('You cannot go back, no moves were made')
       else:
         error_string = 'Illegal move, try again'
         maybe_move = self.closest_move(prev_move)
-        if maybe_move != None:
+        if maybe_move is not None:
           error_string += '. Did you mean {}{}{}?'.format(Colors.BOLD, maybe_move, Colors.RESET)
         print(error_string)
     else:
@@ -118,17 +105,10 @@ class Client(object):
       self.make_turn((True, move))
 
   def computer_turn(self):
-    self.clear()
-    print(self.ui_board.generate(self.fen(), self.board, self.engine))
+    self.ui_board.generate(self.fen(), self.board, self.engine)
     print('\nWaiting for Stockfish...')
     result = self.engine.play(self.board)
     self.board.push(result.move)
 
   def fen(self):
     return self.board.fen()
-
-  def clear(self):
-    if name == 'nt': # For windows
-      system('cls')
-    else: # For mac and linux
-      system('clear')
