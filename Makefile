@@ -16,7 +16,7 @@ test:
 	$(call p_dot_red,Not implemented.)
 
 build:
-	pyinstaller app/__main__.py --name=chss
+	pyinstaller app/__main__.py --name=chss --onefile
 
 clean:
 	$(call pprintf,Cleaning project)
