@@ -17,7 +17,7 @@ test:
 
 build:
 	$(call pprintf,Building project)
-	pyinstaller ./chss.py --name=chss --onefile
+	pyinstaller ./chss.py --name=chss --onefile --add-binary=/Users/nick/projects/chss/app/engine/stockfish-10-64:/Users/nick/projects/chss/dist
 
 clean:
 	$(call pprintf,Cleaning project)
