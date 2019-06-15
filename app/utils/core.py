@@ -19,3 +19,17 @@ class Colors:
     BLACK = '\x1b[48;5;232;1m'
     WHITE = '\x1b[48;5;15;1m'
     RED   = '\x1b[48;5;9;1m'
+
+class Levels:
+  ONE   = 1
+  TWO   = 2
+  THREE = 3
+  FOUR  = 4
+  FIVE  = 5
+  SIX   = 6
+  SEVEN = 7
+  EIGHT = 8
+
+  @staticmethod
+  def level_of_int(n):
+    return max(1, min(n, 8))

@@ -125,7 +125,7 @@ class Board(object):
     if rank == 6:
       return '{}{}┏━━━━━━━━━━━┓'.format(padding_alt, Colors.DULL_GRAY)
     if rank == 7:
-      return '{}{}pc:{}%  cp:{}'.format(padding, Colors.DULL_GRAY, self._score, self._cp)
+      return '{}{}wp:{}%  cp:{}'.format(padding, Colors.DULL_GRAY, self._score, self._cp)
     if rank == 8:
       return '  {}'.format(self.get_user(True))
     return ''
