@@ -27,6 +27,8 @@ class Client(object):
     self.board = chess.Board()
     self.parser = FenParser(self.board.fen())
     self.engine = Engine()
+    self.board.san_move_stack_white = []
+    self.board.san_move_stack_black = []
 
   def run(self):
     try:
@@ -92,12 +94,14 @@ class Client(object):
         print(error_string)
     else:
       print('')
-    move = input('Your move: ')
     try:
+      move = input('Your move: ')
       if move == self.BACK:
         self.board.pop()
         self.board.pop()
       else:
+        s = self.board.parse_san(move)
+        self.board.san_move_stack_white.append(self.board.san(s))
         self.board.push_san(move)
     except ValueError:
       self.make_turn((True, move))
@@ -108,6 +112,7 @@ class Client(object):
     self.ui_board.generate(self.fen(), self.board, self.engine)
     print('\nWaiting for Stockfish...')
     result = self.engine.play(self.board)
+    self.board.san_move_stack_black.append(self.board.san(result.move))
     self.board.push(result.move)
 
   def fen(self):

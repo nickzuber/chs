@@ -9,6 +9,12 @@ PADDING = '    '
 def flatten(l):
   return [item for sublist in l for item in sublist]
 
+def safe_pop(l):
+  try:
+    return l.pop()
+  except IndexError:
+    return None
+
 class Board(object):
   def __init__(self):
     self._score = 0
@@ -71,7 +77,7 @@ class Board(object):
         ui_board += '{}{}'.format(color, piece)
         file_i = file_i + 1
       # Finish the rank
-      ui_board += '{}  {}{}\n'.format(Colors.RESET, self.get_bar_section(rank_i), self.get_meta_section(rank_i))
+      ui_board += '{}  {}{}\n'.format(Colors.RESET, self.get_bar_section(rank_i), self.get_meta_section(board, rank_i))
       rank_i = rank_i - 1
     # Add files label
     ui_board += ' {}{}'.format(PADDING, Colors.GRAY)
@@ -80,15 +86,30 @@ class Board(object):
     ui_board += '\n{}'.format(Colors.RESET)
     return ui_board
 
-  def get_meta_section(self, rank):
+  def get_meta_section(self, board, rank):
     padding = '    '
+    just_played = (
+      chess.WHITE
+      if len(board.san_move_stack_white) > len(board.san_move_stack_black)
+      else chess.BLACK
+    )
     if rank == 1:
       return '  {}'.format(self.get_user())
-    if rank == 5:
-      return '{}{}'.format(padding, 'test')
     if rank == 4:
-      raw_score = Colors.WHITE + str(self._score / 100)
-      return '{}{}'.format(padding, raw_score)
+      white_move = safe_pop(board.san_move_stack_white[-1:]) or ''
+      black_move = safe_pop(board.san_move_stack_black[-1:]) or ''
+      if just_played is chess.WHITE:
+        text = '{}{}'.format(Colors.LIGHT, white_move.ljust(6))
+      else:
+        text = '{}{}{}{}'.format(Colors.GRAY, white_move.ljust(6), Colors.LIGHT, black_move.ljust(6))
+      return '{}{}'.format(padding, text)
+    if rank == 5:
+      white_move = safe_pop(board.san_move_stack_white[-2:-1]) or ''
+      black_move = safe_pop(board.san_move_stack_black[-2:-1]) or ''
+      if just_played is chess.WHITE:
+        black_move = safe_pop(board.san_move_stack_black[-1:]) or ''
+      text = '{}{}{}{}'.format(Colors.GRAY, white_move.ljust(6), Colors.GRAY, black_move.ljust(6))
+      return '{}{}'.format(padding, text)
     if rank == 8:
       return '  {}'.format(self.get_user(True))
     return ''
