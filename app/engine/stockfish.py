@@ -1,10 +1,10 @@
 import os
 import math
 import chess.engine
-from utils.core import Levels
+from app.utils.core import Levels
 
 file_path = os.path.dirname(os.path.abspath(__file__))
-engine_path = 'chess-engine/stockfish-10-64'
+engine_path = 'stockfish-10-64'
 
 class Engine(object):
   def __init__(self, level):

@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 import sys
-from utils.core import Colors, Levels
-from client.runner import Client
+from app.utils.core import Colors, Levels
+from app.client.runner import Client
 
 def main():
   try:
@@ -13,10 +13,12 @@ def main():
   client = Client(level)
   client.run()
 
-if __name__ == '__main__':
+def run():
   try:
     main()
   except Exception as exception:
     print(Colors.RED + '\nUncaught error "{}", exiting the app.\n'.format(
       exception.__class__.__name__
     ))
+
+run()

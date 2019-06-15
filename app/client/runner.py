@@ -2,11 +2,11 @@
 import chess
 import editdistance
 
-from client.ending import GameOver
-from ui.board import Board
-from engine.parser import FenParser
-from engine.stockfish import Engine
-from utils.core import Colors
+from app.client.ending import GameOver
+from app.engine.parser import FenParser
+from app.engine.stockfish import Engine
+from app.ui.board import Board
+from app.utils.core import Colors
 
 class GameOverException(Exception):
   pass

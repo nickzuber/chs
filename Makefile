@@ -9,14 +9,15 @@ p_dot_red = @printf "\033[31m ∗\033[39m \033[89m%s\033[39m\n" "$(1)"
 
 run:
 	$(call pprintf,Running app)
-	@python3 ./app
+	@python3 chss.py
 
 test:
 	$(call pprintf,Running tests for project)
 	$(call p_dot_red,Not implemented.)
 
 build:
-	pyinstaller app/__main__.py --name=chss --onefile
+	$(call pprintf,Building project)
+	pyinstaller ./chss.py --name=chss --onefile
 
 clean:
 	$(call pprintf,Cleaning project)
