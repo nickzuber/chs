@@ -6,7 +6,7 @@ class Colors:
   GREEN  = '\x1b[38;5;2;1m'
   YELLOW = '\x1b[38;5;226;1m'
   ORANGE = '\x1b[38;5;208;1m'
-  RED    = '\x1b[38;5;1m'
+  RED    = '\x1b[38;5;1;1m'
   GRAY   = '\x1b[38;5;242m'
   BOLD   = '\x1b[1m'
   DULL_GRAY  = '\x1b[38;5;238;1m'

@@ -2,6 +2,7 @@ import chess
 import pwd
 import os
 
+from client.ending import GameOver
 from utils.core import Colors
 
 PADDING = '    '
@@ -18,25 +19,28 @@ def safe_pop(l):
 class Board(object):
   def __init__(self):
     self._score = 0
+    self._cp = 0
 
   FILES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 
-  def generate(self, fen, board, engine):
+  def generate(self, fen, board, engine, game_over=None):
     if board.turn:
       # Print board before generating the score
-      board_loading = self._generate(fen, board, True)
+      board_loading = self._generate(fen, board, game_over, True)
       print(board_loading)
       # Analyze the score and print the board again when we're done
-      new_score = engine.score(board)
+      new_cp = engine.score(board)
+      new_score = engine.normalize(new_cp)
       self._score = new_score if new_score is not None else self._score
-      board_loaded = self._generate(fen, board)
+      self._cp = new_cp if new_cp is not None else self._cp
+      board_loaded = self._generate(fen, board, game_over)
       print(board_loaded)
     else:
       # Print board without generating the score
-      board_loading = self._generate(fen, board)
+      board_loading = self._generate(fen, board, game_over)
       print(board_loading)
 
-  def _generate(self, fen, board, loading=False):
+  def _generate(self, fen, board, game_over, loading=False):
     self.clear()
     is_check = board.is_check()
     loading_text = '   {}↻{}\n'.format(Colors.GRAY, Colors.RESET) if loading else '\n'
@@ -77,7 +81,7 @@ class Board(object):
         ui_board += '{}{}'.format(color, piece)
         file_i = file_i + 1
       # Finish the rank
-      ui_board += '{}  {}{}\n'.format(Colors.RESET, self.get_bar_section(rank_i), self.get_meta_section(board, rank_i))
+      ui_board += '{}  {}{}\n'.format(Colors.RESET, self.get_bar_section(rank_i), self.get_meta_section(board, rank_i, game_over))
       rank_i = rank_i - 1
     # Add files label
     ui_board += ' {}{}'.format(PADDING, Colors.GRAY)
@@ -86,30 +90,42 @@ class Board(object):
     ui_board += '\n{}'.format(Colors.RESET)
     return ui_board
 
-  def get_meta_section(self, board, rank):
+  def get_meta_section(self, board, rank, game_over):
     padding = '    '
-    just_played = (
+    padding_alt = '   '
+    just_played = game_over or (
       chess.WHITE
       if len(board.san_move_stack_white) > len(board.san_move_stack_black)
       else chess.BLACK
     )
     if rank == 1:
       return '  {}'.format(self.get_user())
+    if rank == 2 and isinstance(just_played, GameOver):
+      text = '{}{}'.format(Colors.ORANGE, self.string_of_game_over(game_over))
+      return '{}{}'.format(padding, text)
+    if rank == 3:
+      return '{}{}┗━━━━━━━━━━━┛'.format(padding_alt, Colors.DULL_GRAY)
     if rank == 4:
       white_move = safe_pop(board.san_move_stack_white[-1:]) or ''
       black_move = safe_pop(board.san_move_stack_black[-1:]) or ''
       if just_played is chess.WHITE:
-        text = '{}{}'.format(Colors.LIGHT, white_move.ljust(6))
+        text = '{}{}{}'.format(Colors.LIGHT, white_move.ljust(6), ''.ljust(4))
+      elif just_played is chess.BLACK:
+        text = '{}{}{}{}'.format(Colors.GRAY, white_move.ljust(6), Colors.LIGHT, black_move.ljust(4))
       else:
-        text = '{}{}{}{}'.format(Colors.GRAY, white_move.ljust(6), Colors.LIGHT, black_move.ljust(6))
-      return '{}{}'.format(padding, text)
+        text = '{}{}{}{}'.format(Colors.GRAY, white_move.ljust(6), Colors.GRAY, black_move.ljust(4))
+      return '{}{}┃ {}{}┃'.format(padding_alt, Colors.DULL_GRAY, text, Colors.DULL_GRAY)
     if rank == 5:
       white_move = safe_pop(board.san_move_stack_white[-2:-1]) or ''
       black_move = safe_pop(board.san_move_stack_black[-2:-1]) or ''
       if just_played is chess.WHITE:
         black_move = safe_pop(board.san_move_stack_black[-1:]) or ''
-      text = '{}{}{}{}'.format(Colors.GRAY, white_move.ljust(6), Colors.GRAY, black_move.ljust(6))
-      return '{}{}'.format(padding, text)
+      text = '{}{}{}{}'.format(Colors.GRAY, white_move.ljust(6), Colors.GRAY, black_move.ljust(4))
+      return '{}{}┃ {}{}┃'.format(padding_alt, Colors.DULL_GRAY, text, Colors.DULL_GRAY)
+    if rank == 6:
+      return '{}{}┏━━━━━━━━━━━┓'.format(padding_alt, Colors.DULL_GRAY)
+    if rank == 7:
+      return '{}{}pc:{}%  cp:{}'.format(padding, Colors.DULL_GRAY, self._score, self._cp)
     if rank == 8:
       return '  {}'.format(self.get_user(True))
     return ''
@@ -191,6 +207,17 @@ class Board(object):
   def get_coordinates_from_rank_file(self, r, f):
     file = self.FILES[f - 1]
     return '{}{}'.format(file, r)
+
+  def string_of_game_over(self, game_over):
+    if game_over is GameOver.BLACK_WINS:
+      return 'Black wins by checkmate 0-1'
+    if game_over is GameOver.WHITE_WINS:
+      return 'White wins by checkmate 1-0'
+    if game_over is GameOver.DRAW:
+      return 'Draw ½ ½'
+    if game_over is GameOver.RESIGN:
+      return 'White resigns 0-1'
+    return 'Game over'
 
   def clear(self):
     if os.name == 'nt': # For windows

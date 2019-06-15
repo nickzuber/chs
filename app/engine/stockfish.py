@@ -17,12 +17,15 @@ class Engine(object):
     try:
       info = self.engine.analyse(board, chess.engine.Limit(time=0.500))
       cp = chess.engine.PovScore(info['score'], chess.WHITE).pov(chess.WHITE).relative.score()
-      if cp is None:
-        return None
-      raw_score = 2 / (1 + math.exp(-0.004 * cp)) - 1
-      return round(100 * raw_score)
+      return cp
     except chess.engine.EngineTerminatedError:
       return None
+
+  def normalize(self, cp):
+    if cp is None:
+      return None
+    raw_score = 2 / (1 + math.exp(-0.004 * cp)) - 1
+    return round(100 * raw_score)
 
   def done(self):
     try:

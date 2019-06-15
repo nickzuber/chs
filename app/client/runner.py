@@ -2,6 +2,7 @@
 import chess
 import editdistance
 
+from client.ending import GameOver
 from ui.board import Board
 from engine.parser import FenParser
 from engine.stockfish import Engine
@@ -39,26 +40,19 @@ class Client(object):
           self.make_turn()
         else:
           self.computer_turn()
-    except KeyboardInterrupt:
-      self.white_resigns()
     except BlackWinsException:
       # TODO
-      self.ui_board.generate(self.fen(), self.board, self.engine)
-      print('Black wins')
+      self.ui_board.generate(self.fen(), self.board, self.engine, GameOver.BLACK_WINS)
     except WhiteWinsException:
       # TODO
-      self.ui_board.generate(self.fen(), self.board, self.engine)
-      print('White wins')
+      self.ui_board.generate(self.fen(), self.board, self.engine, GameOver.WHITE_WINS)
     except DrawException:
       # TODO
-      self.ui_board.generate(self.fen(), self.board, self.engine)
-      print('Draw')
+      self.ui_board.generate(self.fen(), self.board, self.engine, GameOver.DRAW)
+    except:
+      self.ui_board.generate(self.fen(), self.board, self.engine, GameOver.RESIGN)
     finally:
       self.engine.done()
-
-  def white_resigns(self):
-    self.ui_board.generate(self.fen(), self.board, self.engine)
-    print('\nWhite resigns')
 
   def check_game_over(self):
     if self.board.is_game_over():
