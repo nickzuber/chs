@@ -10,13 +10,13 @@ def main():
     level = Levels.level_of_int(num)
   except:
     level = Levels.ONE
-  print(level)
-  _ = input('halt')
-  client = Client()
+  client = Client(level)
   client.run()
 
 if __name__ == '__main__':
   try:
     main()
-  except:
-    print(Colors.RED + '\n\nError: something went wrong, exiting the app.\n')
+  except Exception as exception:
+    print(Colors.RED + '\nUncaught error "{}", exiting the app.\n'.format(
+      exception.__class__.__name__
+    ))

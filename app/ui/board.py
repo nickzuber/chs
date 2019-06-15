@@ -17,7 +17,8 @@ def safe_pop(l):
     return None
 
 class Board(object):
-  def __init__(self):
+  def __init__(self, level):
+    self._level = level
     self._score = 0
     self._cp = 0
 
@@ -104,26 +105,26 @@ class Board(object):
       text = '{}{}'.format(Colors.ORANGE, self.string_of_game_over(game_over))
       return '{}{}'.format(padding, text)
     if rank == 3:
-      return '{}{}┗━━━━━━━━━━━┛'.format(padding_alt, Colors.DULL_GRAY)
+      return '{}{}┗━━━━━━━━━━━━┛'.format(padding_alt, Colors.DULL_GRAY)
     if rank == 4:
       white_move = safe_pop(board.san_move_stack_white[-1:]) or ''
       black_move = safe_pop(board.san_move_stack_black[-1:]) or ''
       if just_played is chess.WHITE:
-        text = '{}{}{}'.format(Colors.LIGHT, white_move.ljust(6), ''.ljust(4))
+        text = '{}{}{}'.format(Colors.LIGHT, white_move.ljust(6), ''.ljust(5))
       elif just_played is chess.BLACK:
-        text = '{}{}{}{}'.format(Colors.GRAY, white_move.ljust(6), Colors.LIGHT, black_move.ljust(4))
+        text = '{}{}{}{}'.format(Colors.GRAY, white_move.ljust(6), Colors.LIGHT, black_move.ljust(5))
       else:
-        text = '{}{}{}{}'.format(Colors.GRAY, white_move.ljust(6), Colors.GRAY, black_move.ljust(4))
+        text = '{}{}{}{}'.format(Colors.GRAY, white_move.ljust(6), Colors.GRAY, black_move.ljust(5))
       return '{}{}┃ {}{}┃'.format(padding_alt, Colors.DULL_GRAY, text, Colors.DULL_GRAY)
     if rank == 5:
       white_move = safe_pop(board.san_move_stack_white[-2:-1]) or ''
       black_move = safe_pop(board.san_move_stack_black[-2:-1]) or ''
       if just_played is chess.WHITE:
         black_move = safe_pop(board.san_move_stack_black[-1:]) or ''
-      text = '{}{}{}{}'.format(Colors.GRAY, white_move.ljust(6), Colors.GRAY, black_move.ljust(4))
+      text = '{}{}{}{}'.format(Colors.GRAY, white_move.ljust(6), Colors.GRAY, black_move.ljust(5))
       return '{}{}┃ {}{}┃'.format(padding_alt, Colors.DULL_GRAY, text, Colors.DULL_GRAY)
     if rank == 6:
-      return '{}{}┏━━━━━━━━━━━┓'.format(padding_alt, Colors.DULL_GRAY)
+      return '{}{}┏━━━━━━━━━━━━┓'.format(padding_alt, Colors.DULL_GRAY)
     if rank == 7:
       return '{}{}wp:{}%  cp:{}'.format(padding, Colors.DULL_GRAY, self._score, self._cp)
     if rank == 8:
@@ -132,7 +133,7 @@ class Board(object):
 
   def get_user(self, is_computer=False):
     title = '{}BOT {}'.format(Colors.ORANGE, Colors.RESET) if is_computer else ''
-    name = 'stockfish' if is_computer else pwd.getpwuid(os.getuid()).pw_name
+    name = 'stockfish {}'.format(self._level) if is_computer else pwd.getpwuid(os.getuid()).pw_name
     return '{}● {}{}{}{}'.format(Colors.DULL_GREEN, title, Colors.LIGHT, name, Colors.RESET)
 
   def get_bar_section(self, rank):

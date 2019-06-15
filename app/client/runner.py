@@ -23,11 +23,11 @@ class DrawException(GameOverException):
 class Client(object):
   BACK = 'back'
 
-  def __init__(self):
-    self.ui_board = Board()
+  def __init__(self, level):
+    self.ui_board = Board(level)
     self.board = chess.Board()
     self.parser = FenParser(self.board.fen())
-    self.engine = Engine()
+    self.engine = Engine(level)
     self.board.san_move_stack_white = []
     self.board.san_move_stack_black = []
 

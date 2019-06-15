@@ -33,3 +33,9 @@ class Levels:
   @staticmethod
   def level_of_int(n):
     return max(1, min(n, 8))
+
+  @staticmethod
+  def value(l):
+    print(l)
+    lvls = [1, 4, 7, 10, 12, 14, 17, 20]
+    return lvls[l - 1]

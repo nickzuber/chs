@@ -1,14 +1,15 @@
 import os
 import math
 import chess.engine
+from utils.core import Levels
 
 file_path = os.path.dirname(os.path.abspath(__file__))
 engine_path = 'chess-engine/stockfish-10-64'
 
 class Engine(object):
-  def __init__(self):
+  def __init__(self, level):
     self.engine = chess.engine.SimpleEngine.popen_uci(os.path.join(file_path, engine_path))
-    self.engine.configure({'Skill Level': 1})
+    self.engine.configure({'Skill Level': Levels.value(level)})
 
   def play(self, board):
     return self.engine.play(board, chess.engine.Limit(time=1.500))
