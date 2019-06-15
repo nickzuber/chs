@@ -1,5 +1,6 @@
 import chess
-from os import system, name
+import pwd
+import os
 
 from utils.core import Colors
 
@@ -36,9 +37,18 @@ class Board(object):
 
     # Label who's turn it is to move
     turn = fen.split(' ')[1]
-    board = self.get_title_from_move(turn)
+    ui_board = self.get_title_from_move(turn)
+    ui_board += '{}\n'.format(loading_text)
 
-    board += '{}\n'.format(loading_text)
+    position_changes = None
+    try:
+      san = board.peek()
+      uci = board.uci(san)
+      starting_position = uci[0:2]
+      ending_position = uci[2:4]
+      position_changes = (starting_position, ending_position)
+    except IndexError:
+      position_changes = None
 
     # Draw the board and pieces
     positions = fen.split(' ')[0]
@@ -54,21 +64,39 @@ class Board(object):
     for rank in ranks:
       file_i = 1
       pieces = flatten(map(get_piece_composed, list(rank)))
-      board += '{}{} '.format(PADDING, str(rank_i))
+      ui_board += '{}{}{} '.format(PADDING, Colors.GRAY, str(rank_i))
       # Add each piece + tile
       for piece in pieces:
-        color = self.get_tile_color_from_position(rank_i, file_i)
-        board = '{}{}{}'.format(board, color, piece)
+        color = self.get_tile_color_from_position(rank_i, file_i, position_changes)
+        ui_board += '{}{}'.format(color, piece)
         file_i = file_i + 1
       # Finish the rank
-      board = '{}{}  {}\n'.format(board, Colors.RESET, self.get_bar_section(rank_i))
+      ui_board += '{}  {}{}\n'.format(Colors.RESET, self.get_bar_section(rank_i), self.get_meta_section(rank_i))
       rank_i = rank_i - 1
     # Add files label
-    board += ' {}{}'.format(PADDING, Colors.GRAY)
+    ui_board += ' {}{}'.format(PADDING, Colors.GRAY)
     for f in self.FILES:
-      board += ' {}'.format(f)
-    board += '\n{}'.format(Colors.RESET)
-    return board
+      ui_board += ' {}'.format(f)
+    ui_board += '\n{}'.format(Colors.RESET)
+    return ui_board
+
+  def get_meta_section(self, rank):
+    padding = '    '
+    if rank == 1:
+      return '  {}'.format(self.get_user())
+    if rank == 5:
+      return '{}{}'.format(padding, 'test')
+    if rank == 4:
+      raw_score = Colors.WHITE + str(self._score / 100)
+      return '{}{}'.format(padding, raw_score)
+    if rank == 8:
+      return '  {}'.format(self.get_user(True))
+    return ''
+
+  def get_user(self, is_computer=False):
+    title = '{}BOT {}'.format(Colors.ORANGE, Colors.RESET) if is_computer else ''
+    name = 'stockfish' if is_computer else pwd.getpwuid(os.getuid()).pw_name
+    return '{}● {}{}{}{}'.format(Colors.DULL_GREEN, title, Colors.LIGHT, name, Colors.RESET)
 
   def get_bar_section(self, rank):
     percentage = ''
@@ -80,10 +108,10 @@ class Board(object):
     if normalized_score > block_range:
       color = Colors.GREEN if self._score >= 0 else Colors.RED
     # Current bar block is within the block's value range
-    if normalized_score - block_range < 25 and normalized_score > block_range:
-      percentage = '{}{}{}{}%'.format(Colors.RESET, Colors.BOLD, Colors.GRAY, self._score)
-    if block_range == 100:
-      tick = '{}-{}'.format(Colors.DULL_GRAY, color)
+    # if normalized_score - block_range < 25 and normalized_score > block_range:
+    #   percentage = '{}{}{}{}%'.format(Colors.RESET, Colors.BOLD, Colors.GRAY, self._score)
+    if block_range == 125:
+      tick = '{}_{}'.format(Colors.DULL_GRAY, color)
     return '{}{}█ {}{}'.format(color, tick, percentage, Colors.RESET)
 
   def get_title_from_move(self, turn):
@@ -94,14 +122,21 @@ class Board(object):
     return '\n\n {}{}  {}  {}'\
       .format(PADDING, colors, player, Colors.RESET)
 
-  def get_tile_color_from_position(self, r, f):
+  def get_tile_color_from_position(self, r, f, pos_delta):
+    square_coordinates = self.get_coordinates_from_rank_file(r, f)
+    highlight_dark = None
+    highlight_light = None
+    if pos_delta is not None:
+      if square_coordinates in [pos_delta[0], pos_delta[1]]:
+        highlight_light = Colors.Backgrounds.GREEN_LIGHT
+        highlight_dark = Colors.Backgrounds.GREEN_DARK
     if r % 2 == 0:
       if f % 2 == 0:
-        return Colors.Backgrounds.DARK
-      return Colors.Backgrounds.LIGHT
+        return highlight_dark or Colors.Backgrounds.DARK
+      return highlight_light or Colors.Backgrounds.LIGHT
     if f % 2 == 0:
-      return Colors.Backgrounds.LIGHT
-    return Colors.Backgrounds.DARK
+      return highlight_light or Colors.Backgrounds.LIGHT
+    return highlight_dark or Colors.Backgrounds.DARK
 
   def get_piece(self, letter, is_black_check, is_white_check):
     black_king_color = Colors.Backgrounds.RED if is_black_check else Colors.DARK
@@ -132,8 +167,12 @@ class Board(object):
     }
     return pieces.get(letter)
 
+  def get_coordinates_from_rank_file(self, r, f):
+    file = self.FILES[f - 1]
+    return '{}{}'.format(file, r)
+
   def clear(self):
-    if name == 'nt': # For windows
-      system('cls')
+    if os.name == 'nt': # For windows
+      os.system('cls')
     else: # For mac and linux
-      system('clear')
+      os.system('clear')

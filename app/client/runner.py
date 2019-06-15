@@ -98,9 +98,7 @@ class Client(object):
         self.board.pop()
         self.board.pop()
       else:
-        san = self.board.push_san(move)
-        # print(self.board.uci(san))
-        # _ = input('halt!')
+        self.board.push_san(move)
     except ValueError:
       self.make_turn((True, move))
     except IndexError:

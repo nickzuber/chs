@@ -8,6 +8,7 @@ engine_path = 'chess-engine/stockfish-10-64'
 class Engine(object):
   def __init__(self):
     self.engine = chess.engine.SimpleEngine.popen_uci(os.path.join(file_path, engine_path))
+    self.engine.configure({'Skill Level': 1})
 
   def play(self, board):
     return self.engine.play(board, chess.engine.Limit(time=1.500))
