@@ -1,13 +1,8 @@
-# Default things to ignore
-env
-.tox
-htmlcov
-*.pyc
-*.egg-info
-*.coverage
+# Build files
+dist/
+build/
+*.spec
+
+# Others
 __pycache__
 .DS_Store
-
-# Project-specific ignores
-flasher_config.ini
-*.csv
