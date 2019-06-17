@@ -9,7 +9,7 @@ p_dot_red = @printf "\033[31m ∗\033[39m \033[89m%s\033[39m\n" "$(1)"
 
 run:
 	$(call pprintf,Running app)
-	@python3 chss.py
+	@python3 chs.py
 
 test:
 	$(call pprintf,Running tests for project)
@@ -17,10 +17,10 @@ test:
 
 build:
 	$(call pprintf,Building project)
-	pyinstaller ./chss.py --name=chss --onefile --add-binary=/Users/nick/projects/chss/app/engine/stockfish-10-64:/Users/nick/projects/chss/dist
+	pyinstaller ./chs.py --name=chs --onefile --add-binary=/Users/nick/projects/chs/app/engine/stockfish-10-64:/Users/nick/projects/chs/dist
 
 clean:
 	$(call pprintf,Cleaning project)
-	rm ./chss.spec
+	rm ./chs.spec
 	rm -rf ./build
 	rm -rf ./dist

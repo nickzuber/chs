@@ -8,12 +8,12 @@ from distutils.core import setup
 
 requirements = [str(r.req) for r in parse_requirements('requirements.txt', session=False)]
 
-name = 'chss'
+name = 'chs'
 version = 1.0
 
 setup(
   name=name,
   version=version,
   install_requires=requirements,
-  console=['./chss.py'],
+  console=['./chs.py'],
 )
