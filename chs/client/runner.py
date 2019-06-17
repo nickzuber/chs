@@ -2,11 +2,11 @@
 import chess
 import editdistance
 
-from app.client.ending import GameOver
-from app.engine.parser import FenParser
-from app.engine.stockfish import Engine
-from app.ui.board import Board
-from app.utils.core import Colors
+from chs.client.ending import GameOver
+from chs.engine.parser import FenParser
+from chs.engine.stockfish import Engine
+from chs.ui.board import Board
+from chs.utils.core import Colors
 
 class GameOverException(Exception):
   pass
@@ -95,7 +95,7 @@ class Client(object):
         self.board.pop()
       else:
         s = self.board.parse_san(move)
-        self.board.san_move_stack_white.append(self.board.san(s))
+        self.board.san_move_stack_white.chsend(self.board.san(s))
         self.board.push_san(move)
     except ValueError:
       self.make_turn((True, move))
@@ -106,7 +106,7 @@ class Client(object):
     self.ui_board.generate(self.fen(), self.board, self.engine)
     print('\nWaiting for Stockfish...')
     result = self.engine.play(self.board)
-    self.board.san_move_stack_black.append(self.board.san(result.move))
+    self.board.san_move_stack_black.chsend(self.board.san(result.move))
     self.board.push(result.move)
 
   def fen(self):

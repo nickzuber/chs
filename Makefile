@@ -5,7 +5,7 @@ p_remove = @printf "\033[31m ↘\033[39m \033[89m%s\033[39m\n" "$(1)"
 p_dot = @printf "\033[32m ∗\033[39m \033[89m%s\033[39m\n" "$(1)"
 p_dot_red = @printf "\033[31m ∗\033[39m \033[89m%s\033[39m\n" "$(1)"
 
-.PHONY: run test build clean
+.PHONY: run test build release build-exe clean-exe clean
 
 run:
 	$(call pprintf,Running app)
@@ -17,10 +17,21 @@ test:
 
 build:
 	$(call pprintf,Building project)
-	pyinstaller ./chs.py --name=chs --onefile --add-binary=/Users/nick/projects/chs/app/engine/stockfish-10-64:/Users/nick/projects/chs/dist
+	python3 setup.py sdist
 
-clean:
+release:
+	twine upload dist/*
+
+build-exe:
+	$(call pprintf,Building project)
+	pyinstaller ./chs.py --name=chs --onefile --add-binary=/Users/nick/projects/chs/chs/engine/stockfish-10-64:/Users/nick/projects/chs/dist
+
+clean-exe:
 	$(call pprintf,Cleaning project)
 	rm ./chs.spec
 	rm -rf ./build
+	rm -rf ./dist
+
+clean:
+	$(call pprintf,Cleaning project)
 	rm -rf ./dist

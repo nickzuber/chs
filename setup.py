@@ -1,19 +1,23 @@
-#!/usr/bin/env python3
-
-try:
-    from pip.req import parse_requirements  # pip 9.x
-except ImportError:
-    from pip._internal.req import parse_requirements  # pip 10.x
 from distutils.core import setup
 
-requirements = [str(r.req) for r in parse_requirements('requirements.txt', session=False)]
-
 name = 'chs'
-version = 1.0
 
 setup(
-  name=name,
-  version=version,
-  install_requires=requirements,
-  console=['./chs.py'],
+  name = name,
+  packages = ['chs'],
+  version = '1.0',
+  license='MIT',
+  description = 'Play chess against the Stockfish engine in your terminal.',
+  author = 'Nick Zuber',
+  author_email = 'zuber.nicholas@gmail.com',
+  url = 'https://github.com/nickzuber/chs',
+  download_url = 'https://github.com/user/reponame/archive/v_01.tar.gz',
+  keywords = ['chess', 'terminal', 'stockfish'],
+  install_requires=[
+    'python-chess',
+    'editdistance',
+  ],
+  entry_points={
+    'console_scripts': ['{} = chs.__main__:run'.format(name)],
+  }
 )

@@ -2,8 +2,8 @@ import chess
 import pwd
 import os
 
-from app.client.ending import GameOver
-from app.utils.core import Colors
+from chs.client.ending import GameOver
+from chs.utils.core import Colors
 
 PADDING = '    '
 
