@@ -20,6 +20,9 @@ class BlackWinsException(GameOverException):
 class DrawException(GameOverException):
   pass
 
+class ResignException(GameOverException):
+  pass
+
 class Client(object):
   BACK = 'back'
 
@@ -41,15 +44,12 @@ class Client(object):
         else:
           self.computer_turn()
     except BlackWinsException:
-      # TODO
       self.ui_board.generate(self.fen(), self.board, self.engine, GameOver.BLACK_WINS)
     except WhiteWinsException:
-      # TODO
       self.ui_board.generate(self.fen(), self.board, self.engine, GameOver.WHITE_WINS)
     except DrawException:
-      # TODO
       self.ui_board.generate(self.fen(), self.board, self.engine, GameOver.DRAW)
-    except:
+    except ResignException:
       self.ui_board.generate(self.fen(), self.board, self.engine, GameOver.RESIGN)
     finally:
       self.engine.done()
@@ -95,18 +95,20 @@ class Client(object):
         self.board.pop()
       else:
         s = self.board.parse_san(move)
-        self.board.san_move_stack_white.chsend(self.board.san(s))
+        self.board.san_move_stack_white.append(self.board.san(s))
         self.board.push_san(move)
     except ValueError:
       self.make_turn((True, move))
     except IndexError:
       self.make_turn((True, move))
+    except:
+      raise ResignException
 
   def computer_turn(self):
     self.ui_board.generate(self.fen(), self.board, self.engine)
     print('\nWaiting for Stockfish...')
     result = self.engine.play(self.board)
-    self.board.san_move_stack_black.chsend(self.board.san(result.move))
+    self.board.san_move_stack_black.append(self.board.san(result.move))
     self.board.push(result.move)
 
   def fen(self):

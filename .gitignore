@@ -2,6 +2,7 @@
 dist/
 build/
 *.spec
+*.egg-info
 
 # Others
 __pycache__

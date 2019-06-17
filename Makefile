@@ -19,8 +19,12 @@ build:
 	$(call pprintf,Building project)
 	python3 setup.py sdist
 
+rebuild:
+	make clean
+	make build
+
 release:
-	twine upload dist/*
+	twine upload dist/* --verbose
 
 build-exe:
 	$(call pprintf,Building project)
