@@ -10,5 +10,6 @@ install:
   - python3 -V
   - pip -V
   - sudo python3 -m pip install nose
+  - sudo python3 -m pip install -r requirements.txt
 script:
   - make test
