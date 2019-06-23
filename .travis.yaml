@@ -1,0 +1,10 @@
+sudo: required
+language: python
+  - "3.6.4"
+install:
+  - python -V
+  - pip -V
+  - sudo pip install nose
+  - nosetests -V
+script:
+  - make test
