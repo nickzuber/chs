@@ -2,9 +2,8 @@ sudo: required
 language: python
   - "3.6.4"
 install:
-  - python -V
+  - python3 -V
   - pip -V
-  - sudo pip install nose
-  - nosetests -V
+  - sudo python3 -m pip install nose
 script:
-  - nosetests ./tests
+  - make test
