@@ -5,6 +5,7 @@ import os
 from chs.client.ending import GameOver
 from chs.utils.core import Colors
 
+
 PADDING = '    '
 
 def flatten(l):
@@ -66,6 +67,9 @@ class Board(object):
     ranks = positions.split('/')
     rank_i = 8
 
+    # (white, black)
+    captured_pieces = self._get_captured_pieces(positions)
+
     def get_piece_composed(piece):
       if turn == 'b':
         return self.get_piece(piece, is_check, False)
@@ -84,11 +88,13 @@ class Board(object):
       # Finish the rank
       ui_board += '{}  {}{}\n'.format(Colors.RESET, self.get_bar_section(rank_i), self.get_meta_section(board, rank_i, game_over))
       rank_i = rank_i - 1
+
     # Add files label
     ui_board += ' {}{}'.format(PADDING, Colors.GRAY)
     for f in self.FILES:
       ui_board += ' {}'.format(f)
-    ui_board += '\n{}'.format(Colors.RESET)
+    # Extra meta text
+    ui_board += '{}{}\n{}'.format(' ' * 6, self.get_meta_section(board, 9, game_over), Colors.RESET)
     return ui_board
 
   def get_meta_section(self, board, rank, game_over):
@@ -101,34 +107,39 @@ class Board(object):
     )
     if rank == 1:
       return '  {}'.format(self.get_user())
-    if rank == 2 and isinstance(just_played, GameOver):
-      text = '{}{}'.format(Colors.ORANGE, self.string_of_game_over(game_over))
-      return '{}{}'.format(padding, text)
+    if rank == 2:
+      if isinstance(just_played, GameOver):
+        text = '{}{}'.format(Colors.ORANGE, self.string_of_game_over(game_over))
+        return '{}{}'.format(padding, text)
+      else:
+        return '{}{}wp:{}%  cp:{}'.format(padding, Colors.DULL_GRAY, self._score, self._cp)
     if rank == 3:
-      return '{}{}┗━━━━━━━━━━━━┛'.format(padding_alt, Colors.DULL_GRAY)
+      return '{}{}┗━━━━━━━━━━━━━━━┛'.format(padding_alt, Colors.DULL_GRAY)
     if rank == 4:
       white_move = safe_pop(board.san_move_stack_white[-1:]) or ''
       black_move = safe_pop(board.san_move_stack_black[-1:]) or ''
       if just_played is chess.WHITE:
-        text = '{}{}{}'.format(Colors.LIGHT, white_move.ljust(6), ''.ljust(5))
+        text = '{}{}{}'.format(Colors.LIGHT, white_move.ljust(7), ''.ljust(7))
       elif just_played is chess.BLACK:
-        text = '{}{}{}{}'.format(Colors.GRAY, white_move.ljust(6), Colors.LIGHT, black_move.ljust(5))
+        text = '{}{}{}{}'.format(Colors.GRAY, white_move.ljust(7), Colors.LIGHT, black_move.ljust(7))
       else:
-        text = '{}{}{}{}'.format(Colors.GRAY, white_move.ljust(6), Colors.GRAY, black_move.ljust(5))
+        text = '{}{}{}{}'.format(Colors.GRAY, white_move.ljust(7), Colors.GRAY, black_move.ljust(7))
       return '{}{}┃ {}{}┃'.format(padding_alt, Colors.DULL_GRAY, text, Colors.DULL_GRAY)
     if rank == 5:
       white_move = safe_pop(board.san_move_stack_white[-2:-1]) or ''
       black_move = safe_pop(board.san_move_stack_black[-2:-1]) or ''
       if just_played is chess.WHITE:
         black_move = safe_pop(board.san_move_stack_black[-1:]) or ''
-      text = '{}{}{}{}'.format(Colors.GRAY, white_move.ljust(6), Colors.GRAY, black_move.ljust(5))
+      text = '{}{}{}{}'.format(Colors.GRAY, white_move.ljust(7), Colors.GRAY, black_move.ljust(7))
       return '{}{}┃ {}{}┃'.format(padding_alt, Colors.DULL_GRAY, text, Colors.DULL_GRAY)
     if rank == 6:
-      return '{}{}┏━━━━━━━━━━━━┓'.format(padding_alt, Colors.DULL_GRAY)
+      return '{}{}┏━━━━━━━━━━━━━━━┓'.format(padding_alt, Colors.DULL_GRAY)
     if rank == 7:
-      return '{}{}wp:{}%  cp:{}'.format(padding, Colors.DULL_GRAY, self._score, self._cp)
+      return '{}rank 7'.format(padding)
     if rank == 8:
       return '  {}'.format(self.get_user(True))
+    if rank == 9:
+      return '{}rank 9'.format(padding)
     return ''
 
   def get_user(self, is_computer=False):
@@ -145,9 +156,6 @@ class Board(object):
     # Color the bar blocks
     if normalized_score > block_range:
       color = Colors.GREEN if self._score >= 0 else Colors.RED
-    # Current bar block is within the block's value range
-    # if normalized_score - block_range < 25 and normalized_score > block_range:
-    #   percentage = '{}{}{}{}%'.format(Colors.RESET, Colors.BOLD, Colors.GRAY, self._score)
     if block_range == 125:
       tick = '{}_{}'.format(Colors.DULL_GRAY, color)
     return '{}{}█ {}{}'.format(color, tick, percentage, Colors.RESET)
@@ -159,6 +167,42 @@ class Board(object):
       Colors.Backgrounds.WHITE + Colors.DARK)
     return '\n\n {}{}  {}  {}'\
       .format(PADDING, colors, player, Colors.RESET)
+
+  def _get_captured_pieces(self, positions):
+    # White
+    w_pawns = 8 - positions.count('P')
+    w_rooks = 2 - positions.count('R')
+    w_bishops = 2 - positions.count('B')
+    w_knights = 2 - positions.count('N')
+    w_queens = 1 - positions.count('Q')
+    w_kings = 1 - positions.count('K')
+    w_pieces = (
+      ('P' * w_pawns if w_pawns > 0 else '') +
+      ('R' * w_rooks if w_rooks > 0 else '') +
+      ('B' * w_bishops if w_bishops > 0 else '') +
+      ('N' * w_knights if w_knights > 0 else '') +
+      ('Q' * w_queens if w_queens > 0 else '') +
+      ('K' * w_kings if w_kings > 0 else '')
+    )
+    # Black
+    b_pawns = 8 - positions.count('p')
+    b_rooks = 2 - positions.count('r')
+    b_bishops = 2 - positions.count('b')
+    b_knights = 2 - positions.count('n')
+    b_queens = 1 - positions.count('q')
+    b_kings = 1 - positions.count('k')
+    b_pieces = (
+      ('p' * b_pawns if b_pawns > 0 else '') +
+      ('r' * b_rooks if b_rooks > 0 else '') +
+      ('b' * b_bishops if b_bishops > 0 else '') +
+      ('n' * b_knights if b_knights > 0 else '') +
+      ('q' * b_queens if b_queens > 0 else '') +
+      ('k' * b_kings if b_kings > 0 else '')
+    )
+    return (
+      w_pieces,
+      b_pieces
+    )
 
   def get_tile_color_from_position(self, r, f, pos_delta):
     square_coordinates = self.get_coordinates_from_rank_file(r, f)

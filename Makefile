@@ -13,7 +13,7 @@ run:
 
 test:
 	$(call pprintf,Running tests for project)
-	$(call p_dot_red,Not implemented.)
+	python3 -m "nose"
 
 build:
 	$(call pprintf,Building project)

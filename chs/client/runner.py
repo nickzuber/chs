@@ -8,6 +8,7 @@ from chs.engine.stockfish import Engine
 from chs.ui.board import Board
 from chs.utils.core import Colors
 
+
 class GameOverException(Exception):
   pass
 

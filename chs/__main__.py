@@ -4,6 +4,7 @@ import sys
 from chs.utils.core import Colors, Levels
 from chs.client.runner import Client
 
+
 def main():
   try:
     num = int(sys.argv[1].split('=')[1])
