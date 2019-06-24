@@ -1,2 +1,2 @@
-python-chess==0.28.0
+python-chess==0.27.3
 editdistance==0.5.3
