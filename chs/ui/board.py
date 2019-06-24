@@ -67,14 +67,11 @@ class Board(object):
     ranks = positions.split('/')
     rank_i = 8
 
-    # (white, black)
-    captured_pieces = self._get_captured_pieces(positions)
-
     def get_piece_composed(piece):
       if turn == 'b':
-        return self.get_piece(piece, is_check, False)
+        return self.get_piece_colored(piece, is_check, False)
       else:
-        return self.get_piece(piece, False, is_check)
+        return self.get_piece_colored(piece, False, is_check)
 
     for rank in ranks:
       file_i = 1
@@ -86,7 +83,7 @@ class Board(object):
         ui_board += '{}{}'.format(color, piece)
         file_i = file_i + 1
       # Finish the rank
-      ui_board += '{}  {}{}\n'.format(Colors.RESET, self.get_bar_section(rank_i), self.get_meta_section(board, rank_i, game_over))
+      ui_board += '{}  {}{}\n'.format(Colors.RESET, self.get_bar_section(rank_i), self.get_meta_section(board, fen, rank_i, game_over))
       rank_i = rank_i - 1
 
     # Add files label
@@ -94,10 +91,10 @@ class Board(object):
     for f in self.FILES:
       ui_board += ' {}'.format(f)
     # Extra meta text
-    ui_board += '{}{}\n{}'.format(' ' * 6, self.get_meta_section(board, 9, game_over), Colors.RESET)
+    ui_board += '{}{}\n{}'.format(' ' * 6, self.get_meta_section(board, fen, 9, game_over), Colors.RESET)
     return ui_board
 
-  def get_meta_section(self, board, rank, game_over):
+  def get_meta_section(self, board, fen, rank, game_over):
     padding = '    '
     padding_alt = '   '
     just_played = game_over or (
@@ -135,11 +132,19 @@ class Board(object):
     if rank == 6:
       return '{}{}┏━━━━━━━━━━━━━━━┓'.format(padding_alt, Colors.DULL_GRAY)
     if rank == 7:
-      return '{}rank 7'.format(padding)
+      positions = fen.split(' ')[0]
+      ranks = positions.split('/')
+      (captured_pieces, _) = self._get_captured_pieces(positions)
+      t = ''.join(map(self.get_piece, list(captured_pieces)))
+      return '{}{}'.format(padding, t)
     if rank == 8:
       return '  {}'.format(self.get_user(True))
     if rank == 9:
-      return '{}rank 9'.format(padding)
+      positions = fen.split(' ')[0]
+      ranks = positions.split('/')
+      (_, captured_pieces) = self._get_captured_pieces(positions)
+      t = ''.join(map(self.get_piece, list(captured_pieces)))
+      return '{}{}'.format(padding, t)
     return ''
 
   def get_user(self, is_computer=False):
@@ -178,9 +183,9 @@ class Board(object):
     w_kings = 1 - positions.count('K')
     w_pieces = (
       ('P' * w_pawns if w_pawns > 0 else '') +
-      ('R' * w_rooks if w_rooks > 0 else '') +
       ('B' * w_bishops if w_bishops > 0 else '') +
       ('N' * w_knights if w_knights > 0 else '') +
+      ('R' * w_rooks if w_rooks > 0 else '') +
       ('Q' * w_queens if w_queens > 0 else '') +
       ('K' * w_kings if w_kings > 0 else '')
     )
@@ -193,9 +198,9 @@ class Board(object):
     b_kings = 1 - positions.count('k')
     b_pieces = (
       ('p' * b_pawns if b_pawns > 0 else '') +
-      ('r' * b_rooks if b_rooks > 0 else '') +
       ('b' * b_bishops if b_bishops > 0 else '') +
       ('n' * b_knights if b_knights > 0 else '') +
+      ('r' * b_rooks if b_rooks > 0 else '') +
       ('q' * b_queens if b_queens > 0 else '') +
       ('k' * b_kings if b_kings > 0 else '')
     )
@@ -220,7 +225,25 @@ class Board(object):
       return highlight_light or Colors.Backgrounds.LIGHT
     return highlight_dark or Colors.Backgrounds.DARK
 
-  def get_piece(self, letter, is_black_check, is_white_check):
+  ### TODO maybe make get_piece_thin?
+  def get_piece(self, letter):
+    pieces = {
+      'R': '♜ ',
+      'N': '♞ ',
+      'B': '♗ ',
+      'Q': '♕ ',
+      'K': '♔ ',
+      'P': '♙ ',
+      'r': '♜ ',
+      'n': '♞ ',
+      'b': '♝ ',
+      'q': '♛ ',
+      'k': '♚ ',
+      'p': '♙ ',
+    }
+    return pieces.get(letter)
+
+  def get_piece_colored(self, letter, is_black_check, is_white_check):
     black_king_color = Colors.Backgrounds.RED if is_black_check else Colors.DARK
     white_king_color = Colors.Backgrounds.RED if is_white_check else Colors.LIGHT
     pieces = {
