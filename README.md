@@ -8,14 +8,23 @@
 
 ## Installation
 
+This package is available via PyPi.
+
 ```
 $ python3 -m pip install chs
 ```
 
 ## Usage
 
+To play against the default level 1 (easiest) version of the Stockfish engine, just run `chs` command.
+
 ```
 $ chs
+```
+
+You can also specify the level of the engine if you want to tweak the difficulty.
+
+```
 $ chs level=8
 ```
 
