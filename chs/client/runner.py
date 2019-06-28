@@ -30,6 +30,7 @@ class Client(object):
   def __init__(self, level):
     self.ui_board = Board(level)
     self.board = chess.Board()
+    self.board.set_board_fen('r6r/pp1kp2p/2p1b1pb/5QB1/1q1N4/2N5/P1P2PPP/2K4R')
     self.parser = FenParser(self.board.fen())
     self.engine = Engine(level)
     self.board.san_move_stack_white = []

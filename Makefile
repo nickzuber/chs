@@ -15,6 +15,10 @@ test:
 	$(call pprintf,Running tests for project)
 	python3 -m "nose"
 
+test-nocapture:
+	$(call pprintf,Running tests for project)
+	python3 -m "nose" --nocapture
+
 build:
 	$(call pprintf,Building project)
 	python3 setup.py sdist

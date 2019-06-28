@@ -15,9 +15,9 @@ def main():
   client.run()
 
 def run():
-  try:
-    main()
-  except Exception as exception:
-    print(Colors.RED + '\nUncaught error "{}", exiting the app.\n'.format(
-      exception.__class__.__name__
-    ))
+  main()
+  # try:
+  # except Exception as exception:
+  #   print(Colors.RED + '\nUncaught error "{}", exiting the app.\n'.format(
+  #     exception.__class__.__name__
+  #   ))

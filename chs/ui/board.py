@@ -8,6 +8,15 @@ from chs.utils.core import Colors
 
 PADDING = '    '
 
+def disjoin(a, b):
+  result = [a.lower() for a in list(a)]
+  for c in b:
+    try:
+      result.remove(c.lower())
+    except ValueError:
+      pass
+  return ''.join(result)
+
 def flatten(l):
   return [item for sublist in l for item in sublist]
 
@@ -91,7 +100,7 @@ class Board(object):
     for f in self.FILES:
       ui_board += ' {}'.format(f)
     # Extra meta text
-    ui_board += '{}{}\n{}'.format(' ' * 6, self.get_meta_section(board, fen, 9, game_over), Colors.RESET)
+    ui_board += '{}{}\n{}'.format(' ' * 6, self.get_meta_section(board, fen, 0, game_over), Colors.RESET)
     return ui_board
 
   def get_meta_section(self, board, fen, rank, game_over):
@@ -102,6 +111,17 @@ class Board(object):
       if len(board.san_move_stack_white) > len(board.san_move_stack_black)
       else chess.BLACK
     )
+    if rank == 0:
+      positions = fen.split(' ')[0]
+      ranks = positions.split('/')
+      # Calculate advantage pieces
+      (captured_white, captured_black) = self._get_captured_pieces(positions)
+      (white_advantage, black_advantage) = self._diff_pieces(captured_white, captured_black)
+      advantage_text = ''.join(map(self.get_piece, list(white_advantage)))
+      # Calculate advantage score
+      diff_score = self._score_pieces(white_advantage) - self._score_pieces(black_advantage)
+      score_text = '+{}'.format(diff_score) if diff_score > 0 else ''
+      return '{}{}{}{}'.format(padding, Colors.DULL_GRAY, advantage_text, score_text)
     if rank == 1:
       return '  {}'.format(self.get_user())
     if rank == 2:
@@ -134,17 +154,16 @@ class Board(object):
     if rank == 7:
       positions = fen.split(' ')[0]
       ranks = positions.split('/')
-      (captured_pieces, _) = self._get_captured_pieces(positions)
-      t = ''.join(map(self.get_piece, list(captured_pieces)))
-      return '{}{}'.format(padding, t)
+      # Calculate advantage pieces
+      (captured_white, captured_black) = self._get_captured_pieces(positions)
+      (white_advantage, black_advantage) = self._diff_pieces(captured_white, captured_black)
+      advantage_text = ''.join(map(self.get_piece, list(black_advantage)))
+      # Calculate advantage score
+      diff_score = self._score_pieces(black_advantage) - self._score_pieces(white_advantage)
+      score_text = '+{}'.format(diff_score) if diff_score > 0 else ''
+      return '{}{}{}{}'.format(padding, Colors.DULL_GRAY, advantage_text, score_text)
     if rank == 8:
       return '  {}'.format(self.get_user(True))
-    if rank == 9:
-      positions = fen.split(' ')[0]
-      ranks = positions.split('/')
-      (_, captured_pieces) = self._get_captured_pieces(positions)
-      t = ''.join(map(self.get_piece, list(captured_pieces)))
-      return '{}{}'.format(padding, t)
     return ''
 
   def get_user(self, is_computer=False):
@@ -172,6 +191,25 @@ class Board(object):
       Colors.Backgrounds.WHITE + Colors.DARK)
     return '\n\n {}{}  {}  {}'\
       .format(PADDING, colors, player, Colors.RESET)
+
+  def _diff_pieces(self, a, b):
+    white = disjoin(b, a)
+    black = disjoin(a, b)
+    return (white, black)
+
+  def _score_pieces(self, pieces):
+    score = 0
+    scores = {
+      'r': 5,
+      'n': 3,
+      'b': 3,
+      'q': 9,
+      'k': 0,
+      'p': 1
+    }
+    for piece in pieces:
+      score += scores.get(piece)
+    return score
 
   def _get_captured_pieces(self, positions):
     # White

@@ -42,7 +42,35 @@ class TestInit(BaseCommandTestCase):
     fen = '1Qb2rk1/5ppp/1p1p4/3p4/8/4PN2/PPP2PPP/R1B1KB1R'
     (w, b) = ui._get_captured_pieces(fen)
     self.assertEqual(w, 'PN', 'Failed on a variety of captured white pieces.')
-    self.assertEqual(b, 'pprbnnq', 'Failed on a variety of captured black pieces.')
+    self.assertEqual(b, 'ppbnnrq', 'Failed on a variety of captured black pieces.')
+
+  def test_pieces_diff_empty(self):
+    captured_white_pieces = ''
+    captured_black_pieces = ''
+    (white_advantage, black_advantage) = ui._diff_pieces(captured_white_pieces, captured_black_pieces)
+    self.assertEqual(white_advantage, '', 'Failed white advantage on no pieces.')
+    self.assertEqual(black_advantage, '', 'Failed advantage black on no pieces.')
+
+  def test_pieces_diff_same_equal(self):
+    captured_white_pieces = 'PPP'
+    captured_black_pieces = 'ppp'
+    (white_advantage, black_advantage) = ui._diff_pieces(captured_white_pieces, captured_black_pieces)
+    self.assertEqual(white_advantage, '', 'Failed white advantage on same and equal pieces.')
+    self.assertEqual(black_advantage, '', 'Failed advantage black on same and equal pieces.')
+
+  def test_pieces_diff_different_equal(self):
+    captured_white_pieces = 'PP'
+    captured_black_pieces = 'pppp'
+    (white_advantage, black_advantage) = ui._diff_pieces(captured_white_pieces, captured_black_pieces)
+    self.assertEqual(white_advantage, 'pp', 'Failed white advantage on different and equal pieces.')
+    self.assertEqual(black_advantage, '', 'Failed black advantage on different and equal pieces.')
+
+  def test_pieces_diff_same_mixed(self):
+    captured_white_pieces = 'PPNNB'
+    captured_black_pieces = 'pnb'
+    (white_advantage, black_advantage) = ui._diff_pieces(captured_white_pieces, captured_black_pieces)
+    self.assertEqual(white_advantage, '', 'Failed white advantage on different and mixed pieces.')
+    self.assertEqual(black_advantage, 'pn', 'Failed black advantage on different and mixed pieces.')
 
   def tearDown(self):
     pass
