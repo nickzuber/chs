@@ -1,4 +1,4 @@
-# chs
+# ♗ chs
 
 > Play chess against the Stockfish engine in your terminal.
 
