@@ -9,7 +9,14 @@
 ## Installation
 
 ```
-python3 -m pip install chs
+$ python3 -m pip install chs
+```
+
+## Usage
+
+```
+$ chs
+$ chs level=8
 ```
 
 ## License
