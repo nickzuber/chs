@@ -2,7 +2,13 @@
 
 > Play chess against the Stockfish engine in your terminal.
 
-<img src="https://travis-ci.org/nickzuber/chs.svg?branch=master" /> <img src="https://img.shields.io/badge/project-active-brightgreen.svg" /> <img src="https://img.shields.io/badge/released-yes-brightgreen.svg" /> <img src="https://img.shields.io/badge/license-MIT%20Licence-blue.svg" />
+<img src="https://travis-ci.org/nickzuber/chs.svg?branch=master" />
+<img src="https://img.shields.io/badge/project-active-brightgreen.svg" />
+<img src="https://img.shields.io/badge/status-stable-brightgreen.svg" />
+<img src="https://img.shields.io/pypi/dm/chs.svg?color=yellow" />
+<img src="https://img.shields.io/pypi/format/chs.svg" />
+<img src="https://img.shields.io/badge/released-yes-brightgreen.svg" />
+<img src="https://img.shields.io/badge/license-MIT%20Licence-blue.svg" />
 
 <img width="800" src="meta/demo_long.png" />
 
