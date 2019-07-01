@@ -37,7 +37,7 @@ class Client(object):
     self._attempts = []
     self.board.san_move_stack_white = []
     self.board.san_move_stack_black = []
-    self.board.help_engine_hint = 'e2e3'
+    self.board.help_engine_hint = None
 
   def run(self):
     try:
