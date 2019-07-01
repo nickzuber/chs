@@ -8,7 +8,7 @@ from chs.client.runner import Client
 
 def get_version():
   file_path = os.path.dirname(os.path.abspath(__file__))
-  version_file = open(os.path.join(file_path, '../VERSION'), 'r')
+  version_file = open(os.path.join(file_path, 'VERSION'), 'r')
   return version_file.read().rstrip()
 
 def is_help_command(arg):
@@ -43,7 +43,6 @@ def main():
     print('')
   elif len(sys.argv) > 1 and is_version_command(sys.argv[1]):
     print('Running chs {}v{}{}\n'.format(Colors.BOLD, get_version(), Colors.RESET))
-    print('')
   else:
     try:
       num = int(sys.argv[1].split('=')[1])

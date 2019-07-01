@@ -31,7 +31,6 @@ class Client(object):
   def __init__(self, level):
     self.ui_board = Board(level)
     self.board = chess.Board()
-    self.board.set_board_fen('1rb1k2r/2p1bp1p/p1nqpp2/8/2pP4/P1N2N2/1PPQ1PPP/2KR3R')
     self.parser = FenParser(self.board.fen())
     self.engine = Engine(level)  # Engine you're playing against.
     self.hint_engine = Engine(8)  # Engine used to help give you hints.

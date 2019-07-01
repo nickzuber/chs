@@ -1,1 +1,2 @@
 include chs/engine/stockfish-10-64
+include chs/VERSION

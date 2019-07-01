@@ -5,7 +5,7 @@ p_remove = @printf "\033[31m ↘\033[39m \033[89m%s\033[39m\n" "$(1)"
 p_dot = @printf "\033[32m ∗\033[39m \033[89m%s\033[39m\n" "$(1)"
 p_dot_red = @printf "\033[31m ∗\033[39m \033[89m%s\033[39m\n" "$(1)"
 
-.PHONY: run test build release build-exe clean-exe clean
+.PHONY: run test build rebuild release build-exe clean-exe clean
 
 run:
 	$(call pprintf,Running app)
@@ -26,6 +26,24 @@ build:
 rebuild:
 	make clean
 	make build
+
+release-major:
+	$(call pprintf,Releasing project w/ major revision)
+	python3 upgrade.py major
+	make rebuild
+	make release
+
+release-minor:
+	$(call pprintf,Releasing project w/ minor revision)
+	python3 upgrade.py minor
+	make rebuild
+	make release
+
+release-patch:
+	$(call pprintf,Releasing project w/ patch revision)
+	python3 upgrade.py patch
+	make rebuild
+	make release
 
 release:
 	twine upload dist/* --verbose
