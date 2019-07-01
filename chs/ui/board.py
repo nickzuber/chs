@@ -193,7 +193,7 @@ class Board(object):
     normalized_score = self._score + 100
     block_range = rank * 25
     # Color the bar blocks
-    if normalized_score > block_range:
+    if normalized_score >= block_range:
       color = Colors.GREEN if self._score >= 0 else Colors.RED
     if block_range == 125:
       tick = '{}_{}'.format(Colors.DULL_GRAY, color)
