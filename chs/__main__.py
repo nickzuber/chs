@@ -41,6 +41,12 @@ def main():
     print('  2..7  Increasing difficulty')
     print('  8     The most difficult setting')
     print('')
+    print('How to play: Your move: [MOVE]\n')
+    print('Valid values for [MOVE]:')
+    print('        Make moves using valid alegraic notation (e.g. Nf3, e4, etc.)')
+    print('  back  Take back your last move')
+    print('  hint  Get a hint from the engine')
+    print('')
   elif len(sys.argv) > 1 and is_version_command(sys.argv[1]):
     print('Running chs {}v{}{}\n'.format(Colors.BOLD, get_version(), Colors.RESET))
   else:
