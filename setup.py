@@ -1,7 +1,7 @@
 from setuptools import find_packages, setup
 
 name = 'chs'
-version = '1.4'
+version = '1.4.1'
 
 setup(
   name = name,

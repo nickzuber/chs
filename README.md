@@ -18,6 +18,8 @@ $ python3 -m pip install chs
 
 To play against the default level 1 (easiest) version of the Stockfish engine, just run `chs` command.
 
+### How to start playing
+
 ```
 $ chs
 ```
@@ -27,6 +29,14 @@ You can also specify the level of the engine if you want to tweak the difficulty
 ```
 $ chs level=8
 ```
+
+### How to play
+
+There are a few things you can do while playing:
+
+* Make moves using valid alegraic notation (e.g. `Nf3`, `e4`, etc.).
+* Take back your last move by playing `back` instead of a valid move.
+* Get a hint from the engine by playing `hint` instead of a valid move.
 
 ## License
 

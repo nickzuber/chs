@@ -71,6 +71,15 @@ class Board(object):
     except IndexError:
       position_changes = None
 
+    hint_positions = None
+    try:
+      uci = board.help_engine_hint
+      starting_position = uci[0:2]
+      ending_position = uci[2:4]
+      hint_positions = (starting_position, ending_position)
+    except TypeError:
+      hint_positions = None
+
     # Draw the board and pieces
     positions = fen.split(' ')[0]
     ranks = positions.split('/')
@@ -88,7 +97,7 @@ class Board(object):
       ui_board += '{}{}{} '.format(PADDING, Colors.GRAY, str(rank_i))
       # Add each piece + tile
       for piece in pieces:
-        color = self.get_tile_color_from_position(rank_i, file_i, position_changes)
+        color = self.get_tile_color_from_position(rank_i, file_i, position_changes, hint_positions)
         ui_board += '{}{}'.format(color, piece)
         file_i = file_i + 1
       # Finish the rank
@@ -131,26 +140,30 @@ class Board(object):
       else:
         return '{}{}wp:{}%  cp:{}'.format(padding, Colors.DULL_GRAY, self._score, self._cp)
     if rank == 3:
-      return '{}{}┗━━━━━━━━━━━━━━━┛'.format(padding_alt, Colors.DULL_GRAY)
+      return '{}{}┗━━━━━━━━━━━━━━━━━━┛'.format(padding_alt, Colors.DULL_GRAY)
     if rank == 4:
       white_move = safe_pop(board.san_move_stack_white[-1:]) or ''
       black_move = safe_pop(board.san_move_stack_black[-1:]) or ''
+      move_number = len(board.san_move_stack_white)
+      move_number_text = '{}. '.format(move_number) if move_number > 0 else '   '
       if just_played is chess.WHITE:
         text = '{}{}{}'.format(Colors.LIGHT, white_move.ljust(7), ''.ljust(7))
       elif just_played is chess.BLACK:
         text = '{}{}{}{}'.format(Colors.GRAY, white_move.ljust(7), Colors.LIGHT, black_move.ljust(7))
       else:
         text = '{}{}{}{}'.format(Colors.GRAY, white_move.ljust(7), Colors.GRAY, black_move.ljust(7))
-      return '{}{}┃ {}{}┃'.format(padding_alt, Colors.DULL_GRAY, text, Colors.DULL_GRAY)
+      return '{}{}┃ {}{}{}┃'.format(padding_alt, Colors.DULL_GRAY, move_number_text, text, Colors.DULL_GRAY)
     if rank == 5:
       white_move = safe_pop(board.san_move_stack_white[-2:-1]) or ''
       black_move = safe_pop(board.san_move_stack_black[-2:-1]) or ''
+      move_number = len(board.san_move_stack_white) - 1
+      move_number_text = '{}. '.format(move_number) if move_number > 0 else '   '
       if just_played is chess.WHITE:
         black_move = safe_pop(board.san_move_stack_black[-1:]) or ''
       text = '{}{}{}{}'.format(Colors.GRAY, white_move.ljust(7), Colors.GRAY, black_move.ljust(7))
-      return '{}{}┃ {}{}┃'.format(padding_alt, Colors.DULL_GRAY, text, Colors.DULL_GRAY)
+      return '{}{}┃ {}{}{}┃'.format(padding_alt, Colors.DULL_GRAY, move_number_text, text, Colors.DULL_GRAY)
     if rank == 6:
-      return '{}{}┏━━━━━━━━━━━━━━━┓'.format(padding_alt, Colors.DULL_GRAY)
+      return '{}{}┏━━━━━━━━━━━━━━━━━━┓'.format(padding_alt, Colors.DULL_GRAY)
     if rank == 7:
       positions = fen.split(' ')[0]
       ranks = positions.split('/')
@@ -247,7 +260,7 @@ class Board(object):
       b_pieces
     )
 
-  def get_tile_color_from_position(self, r, f, pos_delta):
+  def get_tile_color_from_position(self, r, f, pos_delta, hint_delta):
     square_coordinates = self.get_coordinates_from_rank_file(r, f)
     highlight_dark = None
     highlight_light = None
@@ -255,6 +268,10 @@ class Board(object):
       if square_coordinates in [pos_delta[0], pos_delta[1]]:
         highlight_light = Colors.Backgrounds.GREEN_LIGHT
         highlight_dark = Colors.Backgrounds.GREEN_DARK
+    if hint_delta is not None:
+      if square_coordinates in [hint_delta[0], hint_delta[1]]:
+        highlight_light = Colors.Backgrounds.PURPLE_LIGHT
+        highlight_dark = Colors.Backgrounds.PURPLE_DARK
     if r % 2 == 0:
       if f % 2 == 0:
         return highlight_dark or Colors.Backgrounds.DARK

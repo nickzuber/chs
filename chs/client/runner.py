@@ -26,14 +26,18 @@ class ResignException(GameOverException):
 
 class Client(object):
   BACK = 'back'
+  HINT = 'hint'
 
   def __init__(self, level):
     self.ui_board = Board(level)
     self.board = chess.Board()
     self.parser = FenParser(self.board.fen())
-    self.engine = Engine(level)
+    self.engine = Engine(level)  # Engine you're playing against.
+    self.hint_engine = Engine(8)  # Engine used to help give you hints.
+    self._attempts = []
     self.board.san_move_stack_white = []
     self.board.san_move_stack_black = []
+    self.board.help_engine_hint = 'e2e3'
 
   def run(self):
     try:
@@ -94,11 +98,16 @@ class Client(object):
       if move == self.BACK:
         self.board.pop()
         self.board.pop()
+      elif move == self.HINT:
+        hint = self.hint_engine.play(self.board, 0.500)
+        self.board.help_engine_hint = self.board.uci(hint.move)
       else:
         s = self.board.parse_san(move)
         self.board.san_move_stack_white.append(self.board.san(s))
         self.board.push_san(move)
+        self.board.help_engine_hint = None  # Reset hint if you've made your move.
     except ValueError:
+      self.board.help_engine_hint = None  # Reset hint if you wanna dismiss it by invalid moving.
       self.make_turn((True, move))
     except IndexError:
       self.make_turn((True, move))

@@ -12,8 +12,8 @@ class Engine(object):
     self.engine = chess.engine.SimpleEngine.popen_uci(os.path.join(file_path, engine_path))
     self.engine.configure({'Skill Level': Levels.value(level)})
 
-  def play(self, board):
-    return self.engine.play(board, chess.engine.Limit(time=1.500))
+  def play(self, board, time=1.500):
+    return self.engine.play(board, chess.engine.Limit(time=time))
 
   def score(self, board):
     try:
