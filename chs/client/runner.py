@@ -108,7 +108,7 @@ class Client(object):
         self.board.pop()
         self.board.pop()
       elif move == self.HINT:
-        hint = self.hint_engine.play(self.board, 0.500)
+        hint = self.hint_engine.play(self.board, 1.000)
         self.board.help_engine_hint = self.board.uci(hint.move)
       else:
         s = self.board.parse_san(move)
