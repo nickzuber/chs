@@ -142,12 +142,12 @@ class Board(object):
       else:
         return '{}{}wp:{}%  cp:{}'.format(padding, Colors.DULL_GRAY, self._score, self._cp)
     if rank == 3:
-      return '{}{}┗━━━━━━━━━━━━━━━━━━┛'.format(padding_alt, Colors.DULL_GRAY)
+      return '{}{}┗━━━━━━━━━━━━━━━━━━━┛'.format(padding_alt, Colors.DULL_GRAY)
     if rank == 4:
       white_move = safe_pop(board.san_move_stack_white[-1:]) or ''
       black_move = safe_pop(board.san_move_stack_black[-1:]) or ''
       move_number = len(board.san_move_stack_white)
-      move_number_text = '{}. '.format(move_number) if move_number > 0 else '   '
+      move_number_text = '{} '.format((str(move_number) + '.').ljust(3)) if move_number > 0 else '    '
       if just_played is chess.WHITE:
         text = '{}{}{}'.format(Colors.LIGHT, white_move.ljust(7), ''.ljust(7))
       elif just_played is chess.BLACK:
@@ -159,13 +159,13 @@ class Board(object):
       white_move = safe_pop(board.san_move_stack_white[-2:-1]) or ''
       black_move = safe_pop(board.san_move_stack_black[-2:-1]) or ''
       move_number = len(board.san_move_stack_white) - 1
-      move_number_text = '{}. '.format(move_number) if move_number > 0 else '   '
+      move_number_text = '{} '.format((str(move_number) + '.').ljust(3)) if move_number > 0 else '    '
       if just_played is chess.WHITE:
         black_move = safe_pop(board.san_move_stack_black[-1:]) or ''
       text = '{}{}{}{}'.format(Colors.GRAY, white_move.ljust(7), Colors.GRAY, black_move.ljust(7))
       return '{}{}┃ {}{}{}┃'.format(padding_alt, Colors.DULL_GRAY, move_number_text, text, Colors.DULL_GRAY)
     if rank == 6:
-      return '{}{}┏━━━━━━━━━━━━━━━━━━┓'.format(padding_alt, Colors.DULL_GRAY)
+      return '{}{}┏━━━━━━━━━━━━━━━━━━━┓'.format(padding_alt, Colors.DULL_GRAY)
     if rank == 7:
       positions = fen.split(' ')[0]
       ranks = positions.split('/')

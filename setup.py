@@ -1,11 +1,15 @@
 from setuptools import find_packages, setup
 
 name = 'chs'
-version = '1.4.1'
+
+def get_version():
+  file_path = os.path.dirname(os.path.abspath(__file__))
+  version_file = open(os.path.join(file_path, '../VERSION'), 'r')
+  return version_file.read().rstrip()
 
 setup(
   name = name,
-  version = version,
+  version = get_version(),
   license='MIT',
   description = 'Play chess against the Stockfish engine in your terminal.',
   author = 'Nick Zuber',
