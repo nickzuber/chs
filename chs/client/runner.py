@@ -57,6 +57,7 @@ class Client(object):
       self.ui_board.generate(self.fen(), self.board, self.engine, GameOver.RESIGN)
     finally:
       self.engine.done()
+      self.hint_engine.done()
 
   def check_game_over(self):
     if self.board.is_game_over():
