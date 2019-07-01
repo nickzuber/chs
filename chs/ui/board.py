@@ -3,10 +3,8 @@ import pwd
 import os
 
 from chs.client.ending import GameOver
-from chs.utils.core import Colors
+from chs.utils.core import Colors, Styles
 
-
-PADDING = '    '
 
 def disjoin(a, b):
   result = [a.lower() for a in list(a)]
@@ -39,6 +37,10 @@ class Board(object):
       # Print board before generating the score
       board_loading = self._generate(fen, board, game_over, True)
       print(board_loading)
+      print('\n{}{}{}┏━━━━━━━━━━━━━━━━━━━━━━━┓ \n{}┗{}{}{}waiting{}'.format(
+        Styles.PADDING_SMALL, Colors.WHITE, Colors.BOLD,\
+        Styles.PADDING_SMALL, Styles.PADDING_SMALL, Colors.RESET, Colors.GRAY, Colors.RESET)
+      )
       # Analyze the score and print the board again when we're done
       new_cp = engine.score(board)
       new_score = engine.normalize(new_cp)
@@ -94,7 +96,7 @@ class Board(object):
     for rank in ranks:
       file_i = 1
       pieces = flatten(map(get_piece_composed, list(rank)))
-      ui_board += '{}{}{} '.format(PADDING, Colors.GRAY, str(rank_i))
+      ui_board += '{}{}{} '.format(Styles.PADDING_MEDIUM, Colors.GRAY, str(rank_i))
       # Add each piece + tile
       for piece in pieces:
         color = self.get_tile_color_from_position(rank_i, file_i, position_changes, hint_positions)
@@ -105,7 +107,7 @@ class Board(object):
       rank_i = rank_i - 1
 
     # Add files label
-    ui_board += ' {}{}'.format(PADDING, Colors.GRAY)
+    ui_board += ' {}{}'.format(Styles.PADDING_MEDIUM, Colors.GRAY)
     for f in self.FILES:
       ui_board += ' {}'.format(f)
     # Extra meta text
@@ -203,7 +205,7 @@ class Board(object):
       Colors.Backgrounds.BLACK + Colors.LIGHT if turn == 'b' else\
       Colors.Backgrounds.WHITE + Colors.DARK)
     return '\n\n {}{}  {}  {}'\
-      .format(PADDING, colors, player, Colors.RESET)
+      .format(Styles.PADDING_MEDIUM, colors, player, Colors.RESET)
 
   def _diff_pieces(self, a, b):
     white = disjoin(b, a)

@@ -6,7 +6,7 @@ from chs.client.ending import GameOver
 from chs.engine.parser import FenParser
 from chs.engine.stockfish import Engine
 from chs.ui.board import Board
-from chs.utils.core import Colors
+from chs.utils.core import Colors, Styles
 
 
 class GameOverException(Exception):
@@ -83,17 +83,26 @@ class Client(object):
     self.ui_board.generate(self.fen(), self.board, self.engine)
     if failed:
       if prev_move == self.BACK:
-        print('You cannot go back, no moves were made')
+        print('{}{}  ⃠ You cannot go back, no moves were made.{}'.format(
+          Styles.PADDING_SMALL, Colors.RED, Colors.RESET
+        ))
       else:
-        error_string = 'Illegal move, try again'
         maybe_move = self.closest_move(prev_move)
         if maybe_move is not None:
-          error_string += '. Did you mean {}{}{}?'.format(Colors.BOLD, maybe_move, Colors.RESET)
+          error_string = '{}{}  ⃠ Illegal, did you mean {}{}{}{}{}'.format(
+            Colors.RED, Styles.PADDING_SMALL,\
+            Colors.WHITE, Colors.UNDERLINE, Colors.BOLD, maybe_move, Colors.RESET
+          )
+        else:
+          error_string = '{}{}  ⃠ Illegal, try again.'.format(Styles.PADDING_SMALL, Colors.RED)
         print(error_string)
     else:
       print('')
     try:
-      move = input('Your move: ')
+      move = input('{}{}{}┏━ Your move ━━━━━━━━━━━┓ \n{}┗{}{}'.format(
+        Styles.PADDING_SMALL, Colors.WHITE, Colors.BOLD,\
+        Styles.PADDING_SMALL, Styles.PADDING_SMALL, Colors.RESET)
+      )
       if move == self.BACK:
         self.board.pop()
         self.board.pop()
@@ -115,7 +124,10 @@ class Client(object):
 
   def computer_turn(self):
     self.ui_board.generate(self.fen(), self.board, self.engine)
-    print('\nWaiting for Stockfish...')
+    print('\n{}{}{}┏━ Opponent\'s move ━━━━━┓ \n{}┗{}{}{}thinking...{}'.format(
+      Styles.PADDING_SMALL, Colors.WHITE, Colors.BOLD,\
+      Styles.PADDING_SMALL, Styles.PADDING_SMALL, Colors.RESET, Colors.GRAY, Colors.RESET)
+    )
     result = self.engine.play(self.board)
     self.board.san_move_stack_black.append(self.board.san(result.move))
     self.board.push(result.move)

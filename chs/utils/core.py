@@ -6,9 +6,10 @@ class Colors:
   GREEN  = '\x1b[38;5;2;1m'
   YELLOW = '\x1b[38;5;226;1m'
   ORANGE = '\x1b[38;5;208;1m'
-  RED    = '\x1b[38;5;1;1m'
+  RED    = '\x1b[38;5;1m'
   GRAY   = '\x1b[38;5;242m'
   BOLD   = '\x1b[1m'
+  UNDERLINE  = '\x1b[4m'
   DULL_GRAY  = '\x1b[38;5;238;1m'
   DULL_GREEN = '\x1b[38;5;28;1m'
   class Backgrounds:
@@ -21,6 +22,11 @@ class Colors:
     BLACK = '\x1b[48;5;232;1m'
     WHITE = '\x1b[48;5;15;1m'
     RED   = '\x1b[48;5;9;1m'
+
+class Styles:
+  PADDING_SMALL  = '  '
+  PADDING_MEDIUM = '      '
+  PADDING_LARGE  = '          '
 
 class Levels:
   ONE   = 1
