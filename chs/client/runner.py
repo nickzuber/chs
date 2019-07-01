@@ -34,7 +34,6 @@ class Client(object):
     self.parser = FenParser(self.board.fen())
     self.engine = Engine(level)  # Engine you're playing against.
     self.hint_engine = Engine(8)  # Engine used to help give you hints.
-    self._attempts = []
     self.board.san_move_stack_white = []
     self.board.san_move_stack_black = []
     self.board.help_engine_hint = None
