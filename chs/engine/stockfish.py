@@ -1,11 +1,18 @@
 import os
+import platform
 import math
 import chess.engine
 from chs.utils.core import Levels
 
 
 file_path = os.path.dirname(os.path.abspath(__file__))
-engine_path = 'stockfish-10-64'
+
+if 'Windows' in platform.system():
+  engine_path = 'stockfish_10_x64_windows.exe'
+elif 'Linux' in platform.system():
+  engine_path = 'stockfish_10_x64_linux'
+else:  
+  engine_path = 'stockfish_10_x64_mac'
 
 class Engine(object):
   def __init__(self, level):
