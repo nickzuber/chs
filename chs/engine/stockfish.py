@@ -34,7 +34,7 @@ class Engine(object):
     if cp is None:
       return None
     raw_score = 2 / (1 + math.exp(-0.004 * cp)) - 1
-    return round(100 * raw_score)
+    return round(raw_score, 1)
 
   def done(self):
     try:

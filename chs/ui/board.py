@@ -140,7 +140,7 @@ class Board(object):
         text = '{}{}'.format(Colors.ORANGE, self.string_of_game_over(game_over))
         return '{}{}'.format(padding, text)
       else:
-        return '{}{}wp:{}%  cp:{}'.format(padding, Colors.DULL_GRAY, self._score, self._cp)
+        return '{}{}{} cp:{}'.format(padding, Colors.DULL_GRAY, str(self._score).ljust(11), self._cp)
     if rank == 3:
       return '{}{}┗━━━━━━━━━━━━━━━━━━━┛'.format(padding_alt, Colors.DULL_GRAY)
     if rank == 4:
