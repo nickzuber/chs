@@ -10,7 +10,7 @@ file_path = os.path.dirname(os.path.abspath(__file__))
 if 'Windows' in platform.system():
   engine_path = 'stockfish_10_x64_windows.exe'
 elif 'Linux' in platform.system():
-  engine_path = 'stockfish_10_x64_linux'
+  engine_path = '/usr/games/stockfish'
 else:  
   engine_path = 'stockfish_10_x64_mac'
 
