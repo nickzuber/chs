@@ -34,7 +34,7 @@ $ chs level=8
 
 There are a few things you can do while playing:
 
-* Make moves using valid alegraic notation (e.g. `Nf3`, `e4`, etc.).
+* Make moves using valid algebraic notation (e.g. `Nf3`, `e4`, etc.).
 * Take back your last move by playing `back` instead of a valid move.
 * Get a hint from the engine by playing `hint` instead of a valid move.
 
