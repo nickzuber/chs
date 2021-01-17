@@ -1,5 +1,5 @@
 import chess
-import pwd
+import getpass
 import os
 
 from chs.client.ending import GameOver
@@ -183,7 +183,7 @@ class Board(object):
 
   def get_user(self, is_computer=False):
     title = '{}BOT {}'.format(Colors.ORANGE, Colors.RESET) if is_computer else ''
-    name = 'stockfish {}'.format(self._level) if is_computer else pwd.getpwuid(os.getuid()).pw_name
+    name = 'stockfish {}'.format(self._level) if is_computer else getpass.getuser()
     return '{}● {}{}{}{}'.format(Colors.DULL_GREEN, title, Colors.LIGHT, name, Colors.RESET)
 
   def get_bar_section(self, rank):
