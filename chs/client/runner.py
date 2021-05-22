@@ -1,6 +1,7 @@
 
 import chess
 import editdistance
+from enum import Enum
 
 from chs.client.ending import GameOver
 from chs.engine.parser import FenParser
@@ -8,6 +9,10 @@ from chs.engine.stockfish import Engine
 from chs.ui.board import Board
 from chs.utils.core import Colors, Styles
 
+
+class Player(Enum):
+  BLACK = 1
+  WHITE = 2
 
 class GameOverException(Exception):
   pass
