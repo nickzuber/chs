@@ -74,8 +74,7 @@ def main():
     except:
       level = Levels.ONE
       play_as = Player.WHITE
-    print(play_as)
-    client = Client(level)
+    client = Client(level, play_as)
     client.run()
 
 def run():

@@ -33,8 +33,9 @@ class Client(object):
   BACK = 'back'
   HINT = 'hint'
 
-  def __init__(self, level):
+  def __init__(self, level, play_as):
     self.ui_board = Board(level)
+    self.play_as = play_as
     self.board = chess.Board()
     self.parser = FenParser(self.board.fen())
     self.engine = Engine(level)  # Engine you're playing against.
@@ -47,8 +48,7 @@ class Client(object):
     try:
       while True:
         self.check_game_over()
-        to_move = self.parser.get_to_move(self.fen())
-        if to_move == 'w':
+        if self.is_user_move():
           self.make_turn()
         else:
           self.computer_turn()
@@ -140,3 +140,10 @@ class Client(object):
 
   def fen(self):
     return self.board.fen()
+
+  def is_user_move(self):
+    to_move = self.parser.get_to_move(self.fen())
+    if self.play_as == Player.WHITE:
+      return to_move == 'w'
+    else:
+      return to_move == 'b'
