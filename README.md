@@ -8,10 +8,20 @@
 
 ## Installation
 
+### Pip
+
 This package is available via PyPi.
 
 ```
 $ python3 -m pip install chs
+```
+
+### Arch Linux
+
+There is a [chs-git](https://aur.archlinux.org/packages/chs-git/) package in the Arch User Repository, which you can install with an AUR helper:
+
+```
+$ yay -S chs-git || paru -S chs-git
 ```
 
 ## Usage
