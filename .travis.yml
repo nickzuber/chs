@@ -7,9 +7,9 @@ before_install:
   - sudo apt-get install python3
   - wget https://bootstrap.pypa.io/get-pip.py
 install:
-  - python3 -V
+  - python -V
   - pip -V
-  - sudo python3 -m pip install nose
-  - sudo python3 -m pip install -r requirements.txt
+  - pip install nose
+  - pip install -r requirements.txt
 script:
   - make test
