@@ -1,18 +1,13 @@
 
 import chess
 import editdistance
-from enum import Enum
 
 from chs.client.ending import GameOver
 from chs.engine.parser import FenParser
 from chs.engine.stockfish import Engine
 from chs.ui.board import Board
-from chs.utils.core import Colors, Styles
+from chs.utils.core import Colors, Styles, Player
 
-
-class Player(Enum):
-  BLACK = 1
-  WHITE = 2
 
 class GameOverException(Exception):
   pass
@@ -34,7 +29,7 @@ class Client(object):
   HINT = 'hint'
 
   def __init__(self, level, play_as):
-    self.ui_board = Board(level)
+    self.ui_board = Board(level, play_as)
     self.play_as = play_as
     self.board = chess.Board()
     self.parser = FenParser(self.board.fen())
@@ -117,7 +112,10 @@ class Client(object):
         self.board.help_engine_hint = self.board.uci(hint.move)
       else:
         s = self.board.parse_san(move)
-        self.board.san_move_stack_white.append(self.board.san(s))
+        if self.play_as == Player.WHITE:
+          self.board.san_move_stack_white.append(self.board.san(s))
+        else:
+          self.board.san_move_stack_black.append(self.board.san(s))
         self.board.push_san(move)
         self.board.help_engine_hint = None  # Reset hint if you've made your move.
     except ValueError:
@@ -135,7 +133,10 @@ class Client(object):
       Styles.PADDING_SMALL, Styles.PADDING_SMALL, Colors.RESET, Colors.GRAY, Colors.RESET)
     )
     result = self.engine.play(self.board)
-    self.board.san_move_stack_black.append(self.board.san(result.move))
+    if self.play_as == Player.WHITE:
+      self.board.san_move_stack_black.append(self.board.san(result.move))
+    else:
+      self.board.san_move_stack_white.append(self.board.san(result.move))
     self.board.push(result.move)
 
   def fen(self):

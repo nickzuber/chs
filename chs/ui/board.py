@@ -3,7 +3,7 @@ import pwd
 import os
 
 from chs.client.ending import GameOver
-from chs.utils.core import Colors, Styles
+from chs.utils.core import Colors, Styles, Player
 
 
 def disjoin(a, b):
@@ -25,7 +25,8 @@ def safe_pop(l):
     return None
 
 class Board(object):
-  def __init__(self, level):
+  def __init__(self, level, play_as):
+    self._play_as = play_as
     self._level = level
     self._score = 0
     self._cp = 0
@@ -83,9 +84,13 @@ class Board(object):
       hint_positions = None
 
     # Draw the board and pieces
-    positions = fen.split(' ')[0]
+    fen_positions = fen.split(' ')[0]
+
+    # If user is black, reverse the positions so we draw black first
+    positions = self.white_or_black(fen_positions, fen_positions[::-1])
     ranks = positions.split('/')
-    rank_i = 8
+    rank_i = self.white_or_black(8, 1)
+    rank_i_meta = 8
 
     def get_piece_composed(piece):
       if turn == 'b':
@@ -94,21 +99,25 @@ class Board(object):
         return self.get_piece_colored(piece, False, is_check)
 
     for rank in ranks:
-      file_i = 1
+      file_i = self.white_or_black(1, 8)
+      file_i_meta = 1
       pieces = flatten(map(get_piece_composed, list(rank)))
       ui_board += '{}{}{} '.format(Styles.PADDING_MEDIUM, Colors.GRAY, str(rank_i))
       # Add each piece + tile
       for piece in pieces:
         color = self.get_tile_color_from_position(rank_i, file_i, position_changes, hint_positions)
         ui_board += '{}{}'.format(color, piece)
-        file_i = file_i + 1
+        file_i = self.white_or_black(file_i + 1, file_i - 1)
+        file_i_meta = file_i_meta + 1
       # Finish the rank
-      ui_board += '{}  {}{}\n'.format(Colors.RESET, self.get_bar_section(rank_i), self.get_meta_section(board, fen, rank_i, game_over))
-      rank_i = rank_i - 1
+      ui_board += '{}  {}{}\n'.format(Colors.RESET, self.get_bar_section(rank_i_meta), self.get_meta_section(board, fen, rank_i_meta, game_over))
+      rank_i = self.white_or_black(rank_i - 1, rank_i + 1)
+      rank_i_meta = rank_i_meta - 1
 
-    # Add files label
+    # Add files label - If user is black, reverse the file numbering since board is flipped
     ui_board += ' {}{}'.format(Styles.PADDING_MEDIUM, Colors.GRAY)
-    for f in self.FILES:
+    files_ui = self.white_or_black(self.FILES, self.FILES[::-1])
+    for f in files_ui:
       ui_board += ' {}'.format(f)
     # Extra meta text
     ui_board += '{}{}\n{}'.format(' ' * 6, self.get_meta_section(board, fen, 0, game_over), Colors.RESET)
@@ -343,6 +352,12 @@ class Board(object):
     if game_over is GameOver.RESIGN:
       return 'White resigns 0-1'
     return 'Game over'
+
+  def is_user_white(self):
+    return self._play_as == Player.WHITE
+
+  def white_or_black(self, a, b):
+    return a if self.is_user_white() else b
 
   def clear(self):
     if os.name == 'nt': # For windows

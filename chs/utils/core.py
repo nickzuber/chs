@@ -1,3 +1,6 @@
+from enum import Enum
+
+
 class Colors:
   RESET  = '\x1b[49;0m'
   DARK   = '\x1b[38;5;232;1m'
@@ -27,6 +30,10 @@ class Styles:
   PADDING_SMALL  = '  '
   PADDING_MEDIUM = '      '
   PADDING_LARGE  = '          '
+
+class Player(Enum):
+  BLACK = 1
+  WHITE = 2
 
 class Levels:
   ONE   = 1

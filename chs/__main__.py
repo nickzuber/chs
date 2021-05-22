@@ -2,8 +2,8 @@
 
 import sys
 import os
-from chs.utils.core import Colors, Levels
-from chs.client.runner import Client, Player
+from chs.utils.core import Colors, Levels, Player
+from chs.client.runner import Client
 
 
 def get_version():
