@@ -3,7 +3,7 @@ import pwd
 import os
 
 from chs.client.ending import GameOver
-from chs.utils.core import Colors, Styles, Player
+from chs.utils.core import Colors, Styles
 
 
 def disjoin(a, b):
@@ -23,6 +23,9 @@ def safe_pop(l):
     return l.pop()
   except IndexError:
     return None
+
+def round_to_nearest(x, base=25):
+  return base * round(x / base)
 
 class Board(object):
   def __init__(self, level, play_as):
@@ -137,9 +140,15 @@ class Board(object):
       # Calculate advantage pieces
       (captured_white, captured_black) = self._get_captured_pieces(positions)
       (white_advantage, black_advantage) = self._diff_pieces(captured_white, captured_black)
-      advantage_text = ''.join(map(self.get_piece, list(white_advantage)))
+      advantage_text = ''.join(map(
+        self.get_piece,
+        list(self.white_or_black(white_advantage, black_advantage))
+      ))
       # Calculate advantage score
-      diff_score = self._score_pieces(white_advantage) - self._score_pieces(black_advantage)
+      diff_score = self.white_or_black(
+        self._score_pieces(white_advantage) - self._score_pieces(black_advantage),
+        self._score_pieces(black_advantage) - self._score_pieces(white_advantage)
+      )
       score_text = '+{}'.format(diff_score) if diff_score > 0 else ''
       return '{}{}{}{}'.format(padding, Colors.DULL_GRAY, advantage_text, score_text)
     if rank == 1:
@@ -149,7 +158,10 @@ class Board(object):
         text = '{}{}'.format(Colors.ORANGE, self.string_of_game_over(game_over))
         return '{}{}'.format(padding, text)
       else:
-        return '{}{}{} cp:{}'.format(padding, Colors.DULL_GRAY, str(self._score).ljust(11), self._cp)
+        normalized_score = round(self._score * 100, 1)
+        prefix = '+' if normalized_score >= 0 else ''
+        winning_potential = '{}{}'.format(prefix, normalized_score)
+        return '{}{}{} cp:{}'.format(padding, Colors.DULL_GRAY, winning_potential.ljust(11), self._cp)
     if rank == 3:
       return '{}{}┗━━━━━━━━━━━━━━━━━━━┛'.format(padding_alt, Colors.DULL_GRAY)
     if rank == 4:
@@ -181,9 +193,15 @@ class Board(object):
       # Calculate advantage pieces
       (captured_white, captured_black) = self._get_captured_pieces(positions)
       (white_advantage, black_advantage) = self._diff_pieces(captured_white, captured_black)
-      advantage_text = ''.join(map(self.get_piece, list(black_advantage)))
+      advantage_text = ''.join(map(
+        self.get_piece,
+        list(self.white_or_black(black_advantage, white_advantage))
+      ))
       # Calculate advantage score
-      diff_score = self._score_pieces(black_advantage) - self._score_pieces(white_advantage)
+      diff_score = self.white_or_black(
+        self._score_pieces(black_advantage) - self._score_pieces(white_advantage),
+        self._score_pieces(white_advantage) - self._score_pieces(black_advantage)
+      )
       score_text = '+{}'.format(diff_score) if diff_score > 0 else ''
       return '{}{}{}{}'.format(padding, Colors.DULL_GRAY, advantage_text, score_text)
     if rank == 8:
@@ -199,11 +217,22 @@ class Board(object):
     percentage = ''
     tick = ' '
     color = Colors.DULL_GRAY
-    normalized_score = self._score + 100
+    normalized_score = self.white_or_black(
+      round_to_nearest((self._score * 100) + 100),
+      200 - (round_to_nearest((self._score * 100) + 100))
+    )
     block_range = rank * 25
+
     # Color the bar blocks
     if normalized_score >= block_range:
-      color = Colors.GREEN if self._score >= 0 else Colors.RED
+      if normalized_score == 100:
+        color = Colors.GREEN if self._score >= 0 else Colors.RED
+      else:
+        pos_color = self.white_or_black(Colors.GREEN, Colors.RED)
+        neg_color = self.white_or_black(Colors.RED, Colors.GREEN)
+        color = pos_color if self._score >= 0 else neg_color
+
+    # Include the tick if we're in the center.
     if block_range == 125:
       tick = '{}_{}'.format(Colors.DULL_GRAY, color)
     return '{}{}█ {}{}'.format(color, tick, percentage, Colors.RESET)
@@ -354,7 +383,7 @@ class Board(object):
     return 'Game over'
 
   def is_user_white(self):
-    return self._play_as == Player.WHITE
+    return self._play_as == chess.WHITE
 
   def white_or_black(self, a, b):
     return a if self.is_user_white() else b

@@ -6,7 +6,7 @@ from chs.client.ending import GameOver
 from chs.engine.parser import FenParser
 from chs.engine.stockfish import Engine
 from chs.ui.board import Board
-from chs.utils.core import Colors, Styles, Player
+from chs.utils.core import Colors, Styles
 
 
 class GameOverException(Exception):
@@ -112,7 +112,7 @@ class Client(object):
         self.board.help_engine_hint = self.board.uci(hint.move)
       else:
         s = self.board.parse_san(move)
-        if self.play_as == Player.WHITE:
+        if self.play_as == chess.WHITE:
           self.board.san_move_stack_white.append(self.board.san(s))
         else:
           self.board.san_move_stack_black.append(self.board.san(s))
@@ -133,7 +133,7 @@ class Client(object):
       Styles.PADDING_SMALL, Styles.PADDING_SMALL, Colors.RESET, Colors.GRAY, Colors.RESET)
     )
     result = self.engine.play(self.board)
-    if self.play_as == Player.WHITE:
+    if self.play_as == chess.WHITE:
       self.board.san_move_stack_black.append(self.board.san(result.move))
     else:
       self.board.san_move_stack_white.append(self.board.san(result.move))
@@ -144,7 +144,7 @@ class Client(object):
 
   def is_user_move(self):
     to_move = self.parser.get_to_move(self.fen())
-    if self.play_as == Player.WHITE:
+    if self.play_as == chess.WHITE:
       return to_move == 'w'
     else:
       return to_move == 'b'

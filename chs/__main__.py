@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
+import chess
 import sys
 import os
-from chs.utils.core import Colors, Levels, Player
+from chs.utils.core import Colors, Levels
 from chs.client.runner import Client
 
 
@@ -42,8 +43,8 @@ def get_level_from_args(args):
 def get_player_from_args(args):
   player = [arg for arg in args if "--play-black" in arg]
   if player:
-    return Player.BLACK
-  return Player.WHITE
+    return chess.BLACK
+  return chess.WHITE
 
 def main():
   if len(sys.argv) > 1 and is_help_command(sys.argv[1]):
@@ -73,7 +74,7 @@ def main():
       play_as = get_player_from_args(sys.argv)
     except:
       level = Levels.ONE
-      play_as = Player.WHITE
+      play_as = chess.WHITE
     client = Client(level, play_as)
     client.run()
 

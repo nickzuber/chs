@@ -31,10 +31,6 @@ class Styles:
   PADDING_MEDIUM = '      '
   PADDING_LARGE  = '          '
 
-class Player(Enum):
-  BLACK = 1
-  WHITE = 2
-
 class Levels:
   ONE   = 1
   TWO   = 2
