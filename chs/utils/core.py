@@ -1,6 +1,3 @@
-from enum import Enum
-
-
 class Colors:
   RESET  = '\x1b[49;0m'
   DARK   = '\x1b[38;5;232;1m'
