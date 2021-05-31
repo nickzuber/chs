@@ -7,13 +7,14 @@
 <img src="https://user-images.githubusercontent.com/10540865/119232802-80c34700-baf4-11eb-9fed-af558575ae4e.png" />
 
 ### Table of Contents
- - [Installation](#installation)
-    - [Pip](#pip)
-    - [Arch Linux](#arch-linux)
- - [Usage](#usage)
-    - [How to start playing](#how-to-start-playing)
-    - [How to play](#how-to-play)
- - [License](#license)
+
+- [Installation](#installation)
+  - [Pip](#pip)
+  - [Arch Linux](#arch-linux)
+- [Usage](#usage)
+  - [How to start playing](#how-to-start-playing)
+  - [How to play](#how-to-play)
+- [License](#license)
 
 ## Installation
 
@@ -43,19 +44,31 @@ To play against the default level 1 (easiest) version of the Stockfish engine, j
 $ chs
 ```
 
+To see all possible options, use the help command.
+
+```
+$ chs help
+```
+
+To play as the black pieces, use the `--play-black` flag.
+
+```
+$ chs --play-black
+```
+
 You can also specify the level of the engine if you want to tweak the difficulty.
 
 ```
-$ chs level=8
+$ chs --level=8
 ```
 
 ### How to play
 
 There are a few things you can do while playing:
 
-* Make moves using valid algebraic notation (e.g. `Nf3`, `e4`, etc.).
-* Take back your last move by playing `back` instead of a valid move.
-* Get a hint from the engine by playing `hint` instead of a valid move.
+- Make moves using valid algebraic notation (e.g. `Nf3`, `e4`, etc.).
+- Take back your last move by playing `back` instead of a valid move.
+- Get a hint from the engine by playing `hint` instead of a valid move.
 
 ## License
 

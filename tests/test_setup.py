@@ -1,11 +1,12 @@
 import os
 import subprocess
+import chess
 
 from chs.ui.board import Board
 from tests.framework.base_command_test_case import BaseCommandTestCase
 
 
-ui = Board(1)
+ui = Board(1, chess.WHITE)
 
 class TestInit(BaseCommandTestCase):
   def test_no_captured_pieces(self):

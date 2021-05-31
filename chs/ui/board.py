@@ -24,8 +24,12 @@ def safe_pop(l):
   except IndexError:
     return None
 
+def round_to_nearest(x, base=25):
+  return base * round(x / base)
+
 class Board(object):
-  def __init__(self, level):
+  def __init__(self, level, play_as):
+    self._play_as = play_as
     self._level = level
     self._score = 0
     self._cp = 0
@@ -83,9 +87,13 @@ class Board(object):
       hint_positions = None
 
     # Draw the board and pieces
-    positions = fen.split(' ')[0]
+    fen_positions = fen.split(' ')[0]
+
+    # If user is black, reverse the positions so we draw black first
+    positions = self.white_or_black(fen_positions, fen_positions[::-1])
     ranks = positions.split('/')
-    rank_i = 8
+    rank_i = self.white_or_black(8, 1)
+    rank_i_meta = 8
 
     def get_piece_composed(piece):
       if turn == 'b':
@@ -94,21 +102,25 @@ class Board(object):
         return self.get_piece_colored(piece, False, is_check)
 
     for rank in ranks:
-      file_i = 1
+      file_i = self.white_or_black(1, 8)
+      file_i_meta = 1
       pieces = flatten(map(get_piece_composed, list(rank)))
       ui_board += '{}{}{} '.format(Styles.PADDING_MEDIUM, Colors.GRAY, str(rank_i))
       # Add each piece + tile
       for piece in pieces:
         color = self.get_tile_color_from_position(rank_i, file_i, position_changes, hint_positions)
         ui_board += '{}{}'.format(color, piece)
-        file_i = file_i + 1
+        file_i = self.white_or_black(file_i + 1, file_i - 1)
+        file_i_meta = file_i_meta + 1
       # Finish the rank
-      ui_board += '{}  {}{}\n'.format(Colors.RESET, self.get_bar_section(rank_i), self.get_meta_section(board, fen, rank_i, game_over))
-      rank_i = rank_i - 1
+      ui_board += '{}  {}{}\n'.format(Colors.RESET, self.get_bar_section(rank_i_meta), self.get_meta_section(board, fen, rank_i_meta, game_over))
+      rank_i = self.white_or_black(rank_i - 1, rank_i + 1)
+      rank_i_meta = rank_i_meta - 1
 
-    # Add files label
+    # Add files label - If user is black, reverse the file numbering since board is flipped
     ui_board += ' {}{}'.format(Styles.PADDING_MEDIUM, Colors.GRAY)
-    for f in self.FILES:
+    files_ui = self.white_or_black(self.FILES, self.FILES[::-1])
+    for f in files_ui:
       ui_board += ' {}'.format(f)
     # Extra meta text
     ui_board += '{}{}\n{}'.format(' ' * 6, self.get_meta_section(board, fen, 0, game_over), Colors.RESET)
@@ -128,9 +140,15 @@ class Board(object):
       # Calculate advantage pieces
       (captured_white, captured_black) = self._get_captured_pieces(positions)
       (white_advantage, black_advantage) = self._diff_pieces(captured_white, captured_black)
-      advantage_text = ''.join(map(self.get_piece, list(white_advantage)))
+      advantage_text = ''.join(map(
+        self.get_piece,
+        list(self.white_or_black(white_advantage, black_advantage))
+      ))
       # Calculate advantage score
-      diff_score = self._score_pieces(white_advantage) - self._score_pieces(black_advantage)
+      diff_score = self.white_or_black(
+        self._score_pieces(white_advantage) - self._score_pieces(black_advantage),
+        self._score_pieces(black_advantage) - self._score_pieces(white_advantage)
+      )
       score_text = '+{}'.format(diff_score) if diff_score > 0 else ''
       return '{}{}{}{}'.format(padding, Colors.DULL_GRAY, advantage_text, score_text)
     if rank == 1:
@@ -140,7 +158,10 @@ class Board(object):
         text = '{}{}'.format(Colors.ORANGE, self.string_of_game_over(game_over))
         return '{}{}'.format(padding, text)
       else:
-        return '{}{}{} cp:{}'.format(padding, Colors.DULL_GRAY, str(self._score).ljust(11), self._cp)
+        normalized_score = round(self._score * 100, 1)
+        prefix = '+' if normalized_score >= 0 else ''
+        winning_potential = '{}{}'.format(prefix, normalized_score)
+        return '{}{}{} cp:{}'.format(padding, Colors.DULL_GRAY, winning_potential.ljust(11), self._cp)
     if rank == 3:
       return '{}{}┗━━━━━━━━━━━━━━━━━━━┛'.format(padding_alt, Colors.DULL_GRAY)
     if rank == 4:
@@ -172,9 +193,15 @@ class Board(object):
       # Calculate advantage pieces
       (captured_white, captured_black) = self._get_captured_pieces(positions)
       (white_advantage, black_advantage) = self._diff_pieces(captured_white, captured_black)
-      advantage_text = ''.join(map(self.get_piece, list(black_advantage)))
+      advantage_text = ''.join(map(
+        self.get_piece,
+        list(self.white_or_black(black_advantage, white_advantage))
+      ))
       # Calculate advantage score
-      diff_score = self._score_pieces(black_advantage) - self._score_pieces(white_advantage)
+      diff_score = self.white_or_black(
+        self._score_pieces(black_advantage) - self._score_pieces(white_advantage),
+        self._score_pieces(white_advantage) - self._score_pieces(black_advantage)
+      )
       score_text = '+{}'.format(diff_score) if diff_score > 0 else ''
       return '{}{}{}{}'.format(padding, Colors.DULL_GRAY, advantage_text, score_text)
     if rank == 8:
@@ -190,11 +217,22 @@ class Board(object):
     percentage = ''
     tick = ' '
     color = Colors.DULL_GRAY
-    normalized_score = self._score + 100
+    normalized_score = self.white_or_black(
+      round_to_nearest((self._score * 100) + 100),
+      200 - (round_to_nearest((self._score * 100) + 100))
+    )
     block_range = rank * 25
+
     # Color the bar blocks
     if normalized_score >= block_range:
-      color = Colors.GREEN if self._score >= 0 else Colors.RED
+      if normalized_score == 100:
+        color = Colors.GREEN if self._score >= 0 else Colors.RED
+      else:
+        pos_color = self.white_or_black(Colors.GREEN, Colors.RED)
+        neg_color = self.white_or_black(Colors.RED, Colors.GREEN)
+        color = pos_color if self._score >= 0 else neg_color
+
+    # Include the tick if we're in the center.
     if block_range == 125:
       tick = '{}_{}'.format(Colors.DULL_GRAY, color)
     return '{}{}█ {}{}'.format(color, tick, percentage, Colors.RESET)
@@ -343,6 +381,12 @@ class Board(object):
     if game_over is GameOver.RESIGN:
       return 'White resigns 0-1'
     return 'Game over'
+
+  def is_user_white(self):
+    return self._play_as == chess.WHITE
+
+  def white_or_black(self, a, b):
+    return a if self.is_user_white() else b
 
   def clear(self):
     if os.name == 'nt': # For windows

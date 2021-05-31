@@ -28,8 +28,9 @@ class Client(object):
   BACK = 'back'
   HINT = 'hint'
 
-  def __init__(self, level):
-    self.ui_board = Board(level)
+  def __init__(self, level, play_as):
+    self.ui_board = Board(level, play_as)
+    self.play_as = play_as
     self.board = chess.Board()
     self.parser = FenParser(self.board.fen())
     self.engine = Engine(level)  # Engine you're playing against.
@@ -42,8 +43,7 @@ class Client(object):
     try:
       while True:
         self.check_game_over()
-        to_move = self.parser.get_to_move(self.fen())
-        if to_move == 'w':
+        if self.is_user_move():
           self.make_turn()
         else:
           self.computer_turn()
@@ -112,7 +112,10 @@ class Client(object):
         self.board.help_engine_hint = self.board.uci(hint.move)
       else:
         s = self.board.parse_san(move)
-        self.board.san_move_stack_white.append(self.board.san(s))
+        if self.play_as == chess.WHITE:
+          self.board.san_move_stack_white.append(self.board.san(s))
+        else:
+          self.board.san_move_stack_black.append(self.board.san(s))
         self.board.push_san(move)
         self.board.help_engine_hint = None  # Reset hint if you've made your move.
     except ValueError:
@@ -130,8 +133,18 @@ class Client(object):
       Styles.PADDING_SMALL, Styles.PADDING_SMALL, Colors.RESET, Colors.GRAY, Colors.RESET)
     )
     result = self.engine.play(self.board)
-    self.board.san_move_stack_black.append(self.board.san(result.move))
+    if self.play_as == chess.WHITE:
+      self.board.san_move_stack_black.append(self.board.san(result.move))
+    else:
+      self.board.san_move_stack_white.append(self.board.san(result.move))
     self.board.push(result.move)
 
   def fen(self):
     return self.board.fen()
+
+  def is_user_move(self):
+    to_move = self.parser.get_to_move(self.fen())
+    if self.play_as == chess.WHITE:
+      return to_move == 'w'
+    else:
+      return to_move == 'b'
