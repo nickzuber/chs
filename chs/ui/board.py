@@ -379,7 +379,7 @@ class Board(object):
     if game_over is GameOver.DRAW:
       return 'Draw ½ ½'
     if game_over is GameOver.RESIGN:
-      return 'White resigns 0-1'
+      return self.white_or_black('White resigns 0-1', 'Black resigns 1-0')
     return 'Game over'
 
   def is_user_white(self):
