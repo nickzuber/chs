@@ -105,7 +105,7 @@ class Board(object):
       file_i = self.white_or_black(1, 8)
       file_i_meta = 1
       pieces = flatten(map(get_piece_composed, list(rank)))
-      ui_board += '{}{}{} '.format(Styles.PADDING_MEDIUM, Colors.GRAY, str(rank_i))
+      ui_board += '{}{}{}{} '.format(Styles.PADDING_MEDIUM, Colors.RESET, Colors.GRAY, str(rank_i))
       # Add each piece + tile
       for piece in pieces:
         color = self.get_tile_color_from_position(rank_i, file_i, position_changes, hint_positions)
@@ -379,7 +379,7 @@ class Board(object):
     if game_over is GameOver.DRAW:
       return 'Draw ½ ½'
     if game_over is GameOver.RESIGN:
-      return 'White resigns 0-1'
+      return self.white_or_black('White resigns 0-1', 'Black resigns 1-0')
     return 'Game over'
 
   def is_user_white(self):
