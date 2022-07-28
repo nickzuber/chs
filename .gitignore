@@ -4,6 +4,9 @@ build/
 *.spec
 *.egg-info
 
-# Others
+# Python
+*.pyc
 __pycache__
+
+# Others
 .DS_Store
